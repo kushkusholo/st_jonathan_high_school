@@ -1,0 +1,44 @@
+[
+  {
+    "timestamp": "2026-04-12T22:21:45.640904",
+    "user_message": "hi,hello,how are you,goodmorning, goodafternoon,goodevening",
+    "bot_response_type": "greeting",
+    "bot_response": "Hello! Welcome to St. Jonathan High School. How can I help you today? Feel free to ask me about admissions, fees, academics, or any other school-related information."
+  },
+  {
+    "timestamp": "2026-04-12T22:22:10.505314",
+    "user_message": "location",
+    "bot_response_type": "school_info",
+    "bot_response": "\n        📍 **School Information:**\n        • Name: St. Jonathan High School\n        • Address: P.O. Box 12352,   Mukono\n        • Location: Jinja-Kampala Highway, next to Mbalala Trading Centre\n        • Phone: +256325516717\n        • Email: info@stjJonathan.ug\n        • Principal: Dr. Samuel Mugisha\n        "
+  },
+  {
+    "timestamp": "2026-04-12T22:22:21.634755",
+    "user_message": "fees",
+    "bot_response_type": "faq",
+    "bot_response": "💰 **St. Jonathan High School Fee Structure:**\nPlease note that fees vary by class and academic year. Current approximate rates:\n\n• Senior 1-2: UGX 1,500,000 - 2,000,000 per term\n• Senior 3-4: UGX 2,300,000 - 3,000,000 per term\n• O-Level: UGX 3,000,000 - 3,500,000 per term\n• A-Level: UGX 3,500,000 - 4,000,000 per term\n\nThis includes: tuition, accommodation, meals, and basic amenities.\nAdditional charges: uniforms, books, and activity fees.\n\nFor detailed current fees, please contact the Accounts Department at +256701416197"
+  },
+  {
+    "timestamp": "2026-04-12T22:23:44.861960",
+    "user_message": "when is school closing. when will the school close. at what time is picking students at school",
+    "bot_response_type": "faq",
+    "bot_response": "⚖️ **School will in may 8th 2025:**\n\n**Expected Conduct:**\n• Punctuality to classes and school events\n• Proper school uniform at all times\n• Respect for teachers and authority\n• No smoking, alcohol, or drugs\n• Maintain school property\n• Academic honesty (no cheating)\n\n**Disciplinary Measures:**\n• Verbal warnings\n• Written warnings\n• Community service\n• Detention\n• Suspension (for serious offenses)\n• Expulsion (for major violations)\n\n**Appeal Process:**\nStudents and parents can appeal disciplinary decisions to the Principal within 7 days.\n\n**Contact for Discipline Issues:** Call +256325516717 and request the Dean of Discipline."
+  },
+  {
+    "timestamp": "2026-04-12T22:24:45.776756",
+    "user_message": "Does the school provide boarding?",
+    "bot_response_type": "faq",
+    "bot_response": "🏠 **Boarding Facilities:**\nYes! St. Jonathan High School provides boarding facilities.\n\n✅ **Boarding Options:**\n• Boarding accommodation available for all levels\n• Separate dormitories for boys and girls\n• Modern facilities with security surveillance\n• 24/7 residential staff supervision\n• Feeding program included (3 meals daily)\n• Common rooms with recreational facilities\n\n**Boarding Requirements:**\n• Separate boarding fees apply\n• Medical examination required\n• Bedding and personal items to be provided\n• Parent consent form required\n\nFor boarding inquiries, contact the Boarding Master/Matron at +256325516717"
+  },
+  {
+    "timestamp": "2026-04-16T10:11:47.056024",
+    "user_message": "hi",
+    "bot_response_type": "greeting",
+    "bot_response": "Hello! Welcome to St. Jonathan High School. I'm your school assistant. How can I help you today? Feel free to ask me about admissions, fees, academics, or any other school-related information."
+  },
+  {
+    "timestamp": "2026-04-16T10:11:56.045578",
+    "user_message": "fees",
+    "bot_response_type": "faq",
+    "bot_response": "💰 **St. Jonathan High School Fee Structure:**\nPlease note that fees vary by class and academic year. Current approximate rates:\n\n• Senior 1-2: UGX 2,500,000 - 3,000,000 per term\n• Senior 3-4: UGX 2,800,000 - 3,200,000 per term\n• O-Level: UGX 3,000,000 - 3,500,000 per term\n• A-Level: UGX 3,500,000 - 4,000,000 per term\n\nThis includes: tuition, accommodation, meals, and basic amenities.\nAdditional charges: uniforms, books, and activity fees.\n\nFor detailed current fees, please contact the Accounts Department at +256325516717"
+  }
+]
