@@ -40,5 +40,29 @@
     "user_message": "fees",
     "bot_response_type": "faq",
     "bot_response": "💰 **St. Jonathan High School Fee Structure:**\nPlease note that fees vary by class and academic year. Current approximate rates:\n\n• Senior 1-2: UGX 2,500,000 - 3,000,000 per term\n• Senior 3-4: UGX 2,800,000 - 3,200,000 per term\n• O-Level: UGX 3,000,000 - 3,500,000 per term\n• A-Level: UGX 3,500,000 - 4,000,000 per term\n\nThis includes: tuition, accommodation, meals, and basic amenities.\nAdditional charges: uniforms, books, and activity fees.\n\nFor detailed current fees, please contact the Accounts Department at +256325516717"
+  },
+  {
+    "timestamp": "2026-04-16T10:46:04.067988",
+    "user_message": "hi",
+    "bot_response_type": "greeting",
+    "bot_response": "Hello! Welcome to St. Jonathan High School. I'm your school assistant. How can I help you today? Feel free to ask me about admissions, fees, academics, or any other school-related information."
+  },
+  {
+    "timestamp": "2026-04-16T10:46:21.304761",
+    "user_message": "fees",
+    "bot_response_type": "faq",
+    "bot_response": "💰 **St. Jonathan High School Fee Structure:**\nPlease note that fees vary by class and academic year. Current approximate rates:\n\n• Senior 1-2: UGX 2,500,000 - 3,000,000 per term\n• Senior 3-4: UGX 2,800,000 - 3,200,000 per term\n• O-Level: UGX 3,000,000 - 3,500,000 per term\n• A-Level: UGX 3,500,000 - 4,000,000 per term\n\nThis includes: tuition, accommodation, meals, and basic amenities.\nAdditional charges: uniforms, books, and activity fees.\n\nFor detailed current fees, please contact the Accounts Department at +256325516717"
+  },
+  {
+    "timestamp": "2026-04-16T10:47:01.420842",
+    "user_message": "subjects",
+    "bot_response_type": "faq",
+    "bot_response": "📚 **Subjects Offered at St. Jonathan High School:**\n\n**Core Subjects (All Students):**\n• English Language\n• Mathematics\n• Biology\n• Chemistry\n• Physics\n• Kiswahili\n• History & Social Studies\n• Physical Education\n\n**Elective Subjects:**\n• Computer Science\n• Geography\n• Economics\n• Literature in English\n• Technical/Vocational Studies\n• Religious Studies\n• Fine Art & Design\n\nFor detailed subject offerings per class, please visit our office or call +256325516717"
+  },
+  {
+    "timestamp": "2026-04-16T10:47:48.026634",
+    "user_message": "activities",
+    "bot_response_type": "faq",
+    "bot_response": "🎭 **Extracurricular Activities at St. Jonathan:**\n\n**Sports:**\n• Football (Soccer)\n• Volleyball\n• Basketball\n• Netball\n• Athletics\n• Swimming\n• Tennis\n\n**Clubs & Societies:**\n• Debate Club\n• Science Club\n• Environmental Club\n• Music & Drama\n• Photography Club\n• Computer Club\n• Cultural Groups\n• Leadership Training\n\n**Competitions:**\nStudents participate in:\n• Inter-school competitions\n• National tournaments\n• Academic contests\n• Cultural festivals\n\nParticipation in at least one activity is encouraged. For details, contact the Student Activities Coordinator."
   }
 ]
