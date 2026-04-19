@@ -64,5 +64,17 @@
     "user_message": "activities",
     "bot_response_type": "faq",
     "bot_response": "🎭 **Extracurricular Activities at St. Jonathan:**\n\n**Sports:**\n• Football (Soccer)\n• Volleyball\n• Basketball\n• Netball\n• Athletics\n• Swimming\n• Tennis\n\n**Clubs & Societies:**\n• Debate Club\n• Science Club\n• Environmental Club\n• Music & Drama\n• Photography Club\n• Computer Club\n• Cultural Groups\n• Leadership Training\n\n**Competitions:**\nStudents participate in:\n• Inter-school competitions\n• National tournaments\n• Academic contests\n• Cultural festivals\n\nParticipation in at least one activity is encouraged. For details, contact the Student Activities Coordinator."
+  },
+  {
+    "timestamp": "2026-04-17T17:16:30.284179",
+    "user_message": "fees",
+    "bot_response_type": "faq",
+    "bot_response": "💰 **St. Jonathan High School Fee Structure:**\nPlease note that fees vary by class and academic year. Current approximate rates:\n\n• Senior 1-2: UGX 2,500,000 - 3,000,000 per term\n• Senior 3-4: UGX 2,800,000 - 3,200,000 per term\n• O-Level: UGX 3,000,000 - 3,500,000 per term\n• A-Level: UGX 3,500,000 - 4,000,000 per term\n\nThis includes: tuition, accommodation, meals, and basic amenities.\nAdditional charges: uniforms, books, and activity fees.\n\nFor detailed current fees, please contact the Accounts Department at +256325516717"
+  },
+  {
+    "timestamp": "2026-04-17T17:16:44.874798",
+    "user_message": "hostel",
+    "bot_response_type": "faq",
+    "bot_response": "🏠 **Boarding Facilities:**\nYes! St. Jonathan High School provides boarding facilities.\n\n✅ **Boarding Options:**\n• Boarding accommodation available for all levels\n• Separate dormitories for boys and girls\n• Modern facilities with security surveillance\n• 24/7 residential staff supervision\n• Feeding program included (3 meals daily)\n• Common rooms with recreational facilities\n\n**Boarding Requirements:**\n• Separate boarding fees apply\n• Medical examination required\n• Bedding and personal items to be provided\n• Parent consent form required\n\nFor boarding inquiries, contact the Boarding Master/Matron at +256325516717"
   }
 ]
