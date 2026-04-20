@@ -186,6 +186,65 @@ Open your web browser and navigate to:
 http://localhost:5000
 ```
 
+## 🚀 Quick Deploy to PythonAnywhere (FREE)
+
+### 1. Create Account
+- Go to https://www.pythonanywhere.com/
+- Sign up for free account
+- Verify your email
+
+### 2. Upload Project
+- In PythonAnywhere dashboard, go to **Files** tab
+- Click **"Open bash console here"**
+- Run: `git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git`
+- Or upload files manually
+
+### 3. Run Deployment Script
+```bash
+cd YOUR_REPO_NAME
+chmod +x deploy_pythonanywhere.sh
+./deploy_pythonanywhere.sh
+```
+
+### 4. Create Web App
+- Go to **Web** tab
+- Click **"Add a new web app"**
+- Choose **Flask** → **Python 3.10**
+- Set source code to: `/home/yourusername/YOUR_REPO_NAME`
+
+### 5. Configure WSGI
+- Click **WSGI configuration file** link
+- Copy content from `pythonanywhere_wsgi.py`
+- Replace `YOUR_USERNAME` with your username
+- Add your actual environment variables
+
+### 6. Set Static Files
+- In Web tab, add static file mapping:
+  - URL: `/static/`
+  - Directory: `/home/yourusername/YOUR_REPO_NAME/static`
+
+### 7. Add Environment Variables
+- In Web tab → Variables section, add:
+  - `SECRET_KEY`: your-secure-secret
+  - `ADMIN_PASSWORD`: your-admin-password
+  - `DEBUG`: False
+
+### 8. Reload and Access
+- Click **green Reload button**
+- Your app is live at: `https://yourusername.pythonanywhere.com`
+
+### Test Your Deployment
+- Main chatbot: `https://yourusername.pythonanywhere.com/`
+- Admin login: `https://yourusername.pythonanywhere.com/admin/login`
+- User registration: `https://yourusername.pythonanywhere.com/auth/register`
+
+### Need Help?
+- Check **Web** tab → **Server log** for errors
+- Use **Consoles** tab → **Bash** to run commands
+- Free tier is perfect for school use!
+
+---
+
 ## Project Structure
 
 ```

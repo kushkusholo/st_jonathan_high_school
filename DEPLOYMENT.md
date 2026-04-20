@@ -76,37 +76,168 @@ Your app will be available at: `https://your-app-name.herokuapp.com`
 
 ---
 
-## Option 2: PythonAnywhere (FREE)
+## Option 2: PythonAnywhere (FREE - Great for Schools)
 
 ### Requirements
 - PythonAnywhere account (free at https://www.pythonanywhere.com/)
+- Your project files uploaded
 
-### Steps
+### Step-by-Step Deployment Guide
 
-**1. Sign Up**
+**1. Create PythonAnywhere Account**
 - Go to https://www.pythonanywhere.com/
-- Create free account
-- Activate email
+- Click "Pricing & signup" → "Create a Beginner account" (FREE)
+- Fill in your details and verify email
+- Login to your dashboard
 
-**2. Upload Files**
-- Go to Files section
-- Upload entire project folder
-- Extract if needed
+**2. Upload Your Project Files**
+- In PythonAnywhere dashboard, go to **Files** tab
+- Click **"Upload a file"** or **"Open bash console here"**
+- Upload your entire `school_chatbot` folder
+- Or use git clone if you prefer:
+```bash
+git clone https://github.com/yourusername/your-repo-name.git
+```
 
-**3. Create Web App**
-- Go to Web section
-- Click "Add a new web app"
-- Select Python 3.10
-- Select Flask
-- Point to your app.py
+**3. Set Up Virtual Environment**
+- Go to **Consoles** tab → **"Bash"**
+- Create and activate virtual environment:
+```bash
+cd school_chatbot
+python3.10 -m venv venv
+source venv/bin/activate
+```
 
-**4. Configure**
-- Set working directory
-- Set WSGI file path
-- Reload web app
+**4. Install Dependencies**
+```bash
+pip install -r requirements.txt
+```
 
-**5. Access**
-Your app will be available at: `https://username.pythonanywhere.com`
+**5. Set Up Database**
+- PythonAnywhere uses SQLite by default (perfect for our app)
+- Run this to create the database:
+```bash
+python app.py
+```
+- Press Ctrl+C after it starts (this creates the database)
+- The database file `school.db` will be created
+
+**6. Configure Environment Variables**
+- In PythonAnywhere dashboard, go to **Variables** section
+- Add these environment variables:
+```
+SECRET_KEY=your-secure-random-secret-here
+ADMIN_PASSWORD=your-admin-password
+DEBUG=False
+OPENAI_API_KEY=your-openai-key-if-using-ai
+TWILIO_ACCOUNT_SID=your-twilio-sid-if-using-whatsapp
+TWILIO_AUTH_TOKEN=your-twilio-token-if-using-whatsapp
+TWILIO_WHATSAPP_NUMBER=whatsapp:+1234567890
+```
+
+**7. Create Web App**
+- Go to **Web** tab
+- Click **"Add a new web app"**
+- Choose **"Flask"**
+- Select **Python 3.10**
+- Set **"/home/yourusername/school_chatbot"** as source code directory
+- Set **"app:app"** as application
+
+**8. Configure WSGI File**
+- In the Web tab, click on the **WSGI configuration file** link
+- Replace the content with:
+```python
+import sys
+import os
+
+# Add your project directory to the sys.path
+project_home = '/home/yourusername/school_chatbot'
+if project_home not in sys.path:
+    sys.path.insert(0, project_home)
+
+# Set environment variables
+os.environ['SECRET_KEY'] = 'your-secure-random-secret-here'
+os.environ['ADMIN_PASSWORD'] = 'your-admin-password'
+os.environ['DEBUG'] = 'False'
+# Add other environment variables as needed
+
+# Import your Flask app
+from app import app as application
+```
+
+**9. Set Up Static Files**
+- In Web tab, scroll to **Static files** section
+- Add static file mapping:
+  - URL: `/static/`
+  - Directory: `/home/yourusername/school_chatbot/static`
+
+**10. Reload Web App**
+- Click the **green "Reload" button** in Web tab
+- Your app should now be live!
+
+**11. Access Your App**
+- Your app will be available at: `https://yourusername.pythonanywhere.com`
+- Test all features:
+  - Main chatbot: `https://yourusername.pythonanywhere.com/`
+  - Admin login: `https://yourusername.pythonanywhere.com/admin/login`
+  - User registration: `https://yourusername.pythonanywhere.com/auth/register`
+
+### PythonAnywhere Specific Notes
+
+**Free Tier Limitations:**
+- 512MB storage
+- CPU usage limits
+- No custom domains (use pythonanywhere.com subdomain)
+
+**Database Setup:**
+- SQLite works perfectly on PythonAnywhere
+- Database persists between reloads
+- No additional configuration needed
+
+**File Uploads:**
+- Use the web interface for small files
+- Use SCP/SFTP for large files
+- Or use git for version control
+
+**Environment Variables:**
+- Set in the Web tab → Variables section
+- Or in WSGI file as shown above
+- Never hardcode sensitive data
+
+**Logs and Debugging:**
+- Check **Web** tab → **Server log** for errors
+- Use **Consoles** tab → **Bash** to test commands
+- Run `python app.py` in console to test locally
+
+**Upgrading to Paid:**
+- If you need more resources, upgrade to paid plans
+- Starts at $5/month for more storage and CPU
+- Allows custom domains
+
+### Troubleshooting PythonAnywhere
+
+| Issue | Solution |
+|-------|----------|
+| Import errors | Check virtual environment activation |
+| Database errors | Ensure database file permissions |
+| Static files not loading | Verify static file mappings |
+| 500 errors | Check server logs in Web tab |
+| App not starting | Verify WSGI configuration |
+| Environment variables | Set in Web tab Variables section |
+
+### Backup Strategy for PythonAnywhere
+
+- Use git for version control
+- Download database file regularly
+- Export chat logs periodically
+- Keep environment variables documented
+
+### Performance Tips
+
+- PythonAnywhere free tier is sufficient for school use
+- Monitor CPU usage in dashboard
+- Clear old logs to save space
+- Use efficient database queries
 
 ---
 
