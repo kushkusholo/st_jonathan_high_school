@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Payment Portal</h1>
+            <p>Submit payment requests and follow mobile money instructions.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            {% if message %}
+                <div class="success-message">{{ message }}</div>
+            {% endif %}
+
+            <section class="payment-form">
+                <h2>Request Payment</h2>
+                <form method="POST" action="{{ url_for('payments') }}">
+                    <label for="amount">Amount (UGX)</label>
+                    <input type="number" id="amount" name="amount" step="1000" required>
+
+                    <label for="method">Payment Method</label>
+                    <select id="method" name="method">
+                        <option>Mobile Money</option>
+                        <option>Bank Transfer</option>
+                    </select>
+
+                    <button type="submit" class="send-btn">Create Payment Request</button>
+                </form>
+            </section>
+
+            <section class="payment-list">
+                <h2>My Payments</h2>
+                {% if payments %}
+                    <ul>
+                        {% for payment in payments %}
+                            <li>
+                                {{ payment.created_at.strftime('%Y-%m-%d') }} - {{ payment.method }} - UGX {{ payment.amount }} - {{ payment.status }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No payment records yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="payment-instructions">
+                <h2>Mobile Money Instructions</h2>
+                <p>Use your provider to send the requested amount to the school account, then note the reference and confirm payment with the school.</p>
+                <p>Contact accounts at <a href="tel:{{ school_info.phone }}">{{ school_info.phone }}</a> for help.</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

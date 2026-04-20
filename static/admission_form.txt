@@ -1,0 +1,27 @@
+St. Jonathan High School Admission Form
+
+Please complete the following information clearly.
+
+1. Student Name:
+2. Class Applying For: (e.g. S.1, S.2, S.3, S.4, O-Level)
+3. Date of Birth:
+4. Gender:
+5. Parent/Guardian Name:
+6. Parent/Guardian Phone:
+7. Parent/Guardian Email:
+8. Previous School:
+9. Previous Academic Year Results:
+10. Address:
+11. Emergency Contact Name:
+12. Emergency Contact Phone:
+13. Medical Conditions:
+14. Additional Notes:
+
+Required documents to attach:
+- Primary Leaving Certificate or PSLC
+- Previous school report
+- Birth certificate or national ID
+- Parent/guardian consent
+- Medical form
+
+Submit this form to the school office or contact admissions for more information.

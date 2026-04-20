@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Welcome, {{ current_user.name }}</h1>
+                <p>Role: {{ current_user.role | capitalize }}</p>
+            </div>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('auth_logout') }}">Logout</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            {% if role == 'admin' %}
+                <section class="dashboard-card">
+                    <h2>Admin Summary</h2>
+                    <p>Students: {{ student_count }}</p>
+                    <p>Staff: {{ staff_count }}</p>
+                    <p>Payments: {{ payment_count }}</p>
+                    <div class="dashboard-actions">
+                        <a class="suggestion-btn" href="{{ url_for('admin_students') }}">Manage Students</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_staff') }}">Manage Staff</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_notifications') }}">Manage Notifications</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_dashboard') }}">Manage FAQs</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_logs') }}">View Chat Logs</a>
+                    </div>
+                </section>
+            {% elif role == 'staff' %}
+                <section class="dashboard-card">
+                    <h2>Staff Portal</h2>
+                    <p>Use this portal to manage attendance, exams, and send reminders.</p>
+                    <div class="dashboard-actions">
+                        <a class="suggestion-btn" href="{{ url_for('staff_attendance') }}">Manage Attendance</a>
+                        <a class="suggestion-btn" href="{{ url_for('staff_exams') }}">Manage Exams</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_whatsapp') }}">WhatsApp Messages</a>
+                        <a class="suggestion-btn" href="{{ url_for('payments') }}">Payments</a>
+                        <a class="suggestion-btn" href="{{ url_for('notifications') }}">Notifications</a>
+                        <a class="suggestion-btn" href="{{ url_for('voice_page') }}">Voice Assistant</a>
+                    </div>
+                </section>
+            {% else %}
+                <section class="dashboard-card">
+                    <h2>My School Portal</h2>
+                    <p>Welcome to your student support portal.</p>
+                    <div class="dashboard-actions">
+                        <a class="suggestion-btn" href="{{ url_for('payments') }}">Pay Fees</a>
+                        <a class="suggestion-btn" href="{{ url_for('notifications') }}">View Notifications</a>
+                        <a class="suggestion-btn" href="{{ url_for('voice_page') }}">Voice Assistant</a>
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if role != 'admin' %}
+                {% if child_students %}
+                    <section class="dashboard-card">
+                        <h2>Children</h2>
+                        {% for child in child_students %}
+                            <div class="record-card">
+                                <strong>{{ child.name }}</strong>
+                                <p>Class: {{ child.class_level }}</p>
+                                <p>Admission Year: {{ child.admission_year or 'N/A' }}</p>
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+
+                {% if student %}
+                    <section class="dashboard-card">
+                        <h2>Student Record</h2>
+                        <p>Name: {{ student.name }}</p>
+                        <p>Class: {{ student.class_level }}</p>
+                        <p>Admission Year: {{ student.admission_year or 'N/A' }}</p>
+                    </section>
+                {% endif %}
+
+                <section class="dashboard-card">
+                    <h2>Notifications</h2>
+                    {% if notices %}
+                        <ul class="notification-list">
+                            {% for notice in notices %}
+                                <li>
+                                    <strong>{{ notice.title }}</strong><br>
+                                    {{ notice.message }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No notifications yet.</p>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container auth-container">
+        <header class="header">
+            <h1>School Portal Registration</h1>
+            <p>Create a parent, student, or staff account.</p>
+        </header>
+        <main class="auth-card">
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('auth_register') }}">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="role">Account Type</label>
+                <select id="role" name="role">
+                    <option value="parent">Parent</option>
+                    <option value="student">Student</option>
+                    <option value="staff">Staff</option>
+                </select>
+
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone">
+
+                <div class="conditional-fields">
+                    <label for="child_name">Child Name (Parent only)</label>
+                    <input type="text" id="child_name" name="child_name">
+
+                    <label for="child_level">Child Class Level</label>
+                    <input type="text" id="child_level" name="child_level" placeholder="S.1, S.2, S.3, S.4, O-Level">
+                </div>
+
+                <button type="submit" class="send-btn">Register</button>
+            </form>
+            <p>Already registered? <a href="{{ url_for('auth_login') }}">Login here</a></p>
+            <p><a href="/">Back to Chatbot</a></p>
+        </main>
+    </div>
+</body>
+</html>

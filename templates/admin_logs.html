@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Chat Logs - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container admin-dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Chat Logs</h1>
+                <p>Review recent conversations between parents and the chatbot.</p>
+            </div>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a class="utility-btn" href="{{ url_for('admin_logout') }}">Logout</a>
+                <a class="utility-btn" href="/">View Chatbot</a>
+            </div>
+        </header>
+
+        <main class="admin-panel">
+            <section class="log-management">
+                <div class="log-controls">
+                    <form method="POST" action="{{ url_for('admin_clear_logs') }}" onsubmit="return confirm('Clear all chat logs? This cannot be undone.');">
+                        <button type="submit" class="delete-btn">Clear All Logs</button>
+                    </form>
+                </div>
+
+                {% if logs %}
+                    <div class="log-table">
+                        {% for log in logs|reverse %}
+                            <div class="log-row">
+                                <div class="log-header">
+                                    <span class="log-time">{{ log.timestamp }}</span>
+                                    <span class="log-type">{{ log.bot_response_type }}</span>
+                                </div>
+                                <div class="log-body">
+                                    <p><strong>User:</strong> {{ log.user_message }}</p>
+                                    <p><strong>Bot:</strong> {{ log.bot_response }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No chat logs available yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

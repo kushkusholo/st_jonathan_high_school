@@ -13,16 +13,23 @@ A comprehensive web-based chatbot system designed to facilitate communication be
 - 📊 Conversation logging for school administration
 - 🔒 User-friendly interface with quick suggestions
 - 📞 Direct contact information display
+- 👥 **NEW:** Parent/Student/Staff authentication and dashboards
+- 💰 **NEW:** Payment tracking and mobile money integration
+- 📱 **NEW:** WhatsApp messaging integration
+- 🔔 **NEW:** Notification system for announcements
+- 🎤 **NEW:** Voice assistant with browser speech recognition
+- 👨‍🏫 **NEW:** Staff portal for attendance and exam management
+- 👨‍💼 **NEW:** Admin dashboard for full school management
 
 ## School Information
 
 **St. Jonathan High School**
 - **Address:** P.O. Box 12352, Kampala
 - **Location:** Jinja-Kampala Highway, next to Mbalala Trading Centre
-- **Phone:** +256325516717
+- **Phone:** +256701416197
 - **Email:** info@stjonathan.ug
-- **Principal:** Dr. Samuel Mugisha
-- **Established:** 2010
+- **Principal:** Dr. MAIKI PROTUS
+- **Established:** 2017
 
 ## FAQ Categories
 
@@ -37,6 +44,48 @@ The chatbot covers the following topics:
 7. **About School** - School vision, mission, and values
 8. **Student Life** - Extracurricular activities and clubs
 9. **School Policies** - Discipline and conduct policies
+
+## New Features Overview
+
+### User Authentication & Portals
+- **Parent Portal:** Register children, view fees, make payments, receive notifications
+- **Student Portal:** View personal records and notifications
+- **Staff Portal:** Manage attendance, record exam results, send WhatsApp messages
+- **Admin Portal:** Full school management including students, staff, payments, notifications
+
+### Payment System
+- Mobile money payment requests
+- Payment reconciliation dashboard
+- Mobile money callback simulation
+- Payment status tracking (pending/confirmed/rejected)
+
+### WhatsApp Integration
+- Automated WhatsApp webhook for incoming messages
+- Admin inbox for viewing and replying to messages
+- Message history storage
+
+### Notification System
+- Create targeted announcements (all users, parents, students, staff, admins)
+- Notification dashboard for users
+- Automated delivery system
+
+### Voice Assistant
+- Browser-based speech recognition
+- Voice input for chatbot queries
+- Real-time response display
+
+### Staff Management Tools
+- Attendance recording with date, status, and remarks
+- Exam result entry with scores and grades
+- Student record management
+
+### Admin Management Tools
+- Student and staff CRUD operations
+- FAQ management (add/delete)
+- Chat log viewing and clearing
+- Payment reconciliation
+- Notification creation
+- WhatsApp message management
 
 ## Installation & Setup
 
@@ -71,6 +120,57 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Step 3.1: Configure Environment Variables
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Required
+SECRET_KEY=your_secure_random_secret_here
+
+# Optional - AI Features
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Optional - Admin Access
+ADMIN_PASSWORD=your_admin_password_here
+
+# Optional - WhatsApp Integration
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_NUMBER=whatsapp:+1234567890
+
+# Optional - Deployment
+DEBUG=False
+PORT=5000
+```
+
+### Step 3.2: Admin Setup
+After setting `ADMIN_PASSWORD`, access the admin dashboard at:
+```
+http://localhost:5000/admin/login
+```
+
+Use the admin dashboard to:
+- Manage FAQs
+- View chat logs
+- Manage students, staff, and notifications
+- Reconcile payments
+- View WhatsApp messages
+
+### Step 3.3: User Registration
+Parents can register at:
+```
+http://localhost:5000/auth/register
+```
+
+Staff and students can also register and access role-specific portals.
+
+### Step 3.4: WhatsApp Setup (Optional)
+To enable WhatsApp messaging:
+1. Set up a Twilio account
+2. Configure a WhatsApp sandbox or business account
+3. Set the webhook URL to: `https://yourdomain.com/whatsapp/webhook`
+4. Add the Twilio credentials to `.env`
+
 ### Step 4: Run the Application
 
 ```bash
@@ -94,6 +194,12 @@ school_chatbot/
 ├── app.py                      # Flask application (main backend)
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # This file
+├── config.py                   # Configuration settings
+├── runtime.txt                 # Python runtime version
+├── Procfile                    # Heroku deployment
+├── render.yaml                 # Render deployment
+├── run.bat                     # Windows startup script
+├── run.sh                      # Linux/Mac startup script
 │
 ├── data/
 │   └── faqs.json              # FAQ database
@@ -101,18 +207,95 @@ school_chatbot/
 ├── logs/
 │   └── chat_logs.json         # Conversation logs
 │
-├── templates/
-│   └── index.html             # Main chatbot interface
+├── static/
+│   ├── style.css              # Main styling
+│   ├── script.js              # Frontend JavaScript
+│   └── admission_form.txt     # Admission form download
 │
-└── static/
-    ├── style.css              # Styling
-    ├── script.js              # Frontend JavaScript
-    └── ...
+└── templates/
+    ├── index.html             # Main chatbot interface
+    ├── admin_dashboard.html   # Admin FAQ management
+    ├── admin_login.html       # Admin authentication
+    ├── admin_logs.html        # Chat log viewer
+    ├── admin_students.html    # Student management
+    ├── admin_staff.html       # Staff management
+    ├── admin_notifications.html # Notification management
+    ├── admin_whatsapp.html    # WhatsApp inbox
+    ├── admin_payments.html    # Payment reconciliation
+    ├── auth_login.html        # User login
+    ├── auth_register.html     # User registration
+    ├── dashboard.html         # User dashboard
+    ├── admissions.html        # Admissions guide
+    ├── payments.html          # Payment portal
+    ├── notifications.html     # Notification viewer
+    ├── voice.html             # Voice assistant
+    ├── staff_attendance.html  # Attendance management
+    └── staff_exams.html       # Exam management
 ```
 
 ## Usage Guide
 
 ### For Parents/Guardians:
+1. **Register:** Create an account and add your children
+2. **Chat:** Ask questions about school services
+3. **Pay Fees:** Submit payment requests via mobile money
+4. **View Records:** Check notifications and payment status
+5. **Contact:** Use WhatsApp or call for urgent matters
+
+### For Students:
+1. **Login:** Access your personal dashboard
+2. **View Notifications:** Stay updated on school announcements
+3. **Access Services:** Use voice assistant and payment portal
+
+### For Staff:
+1. **Login:** Access staff portal
+2. **Record Attendance:** Mark daily attendance for students
+3. **Enter Exam Results:** Record scores and grades
+4. **Send Messages:** Reply to WhatsApp inquiries
+
+### For Administrators:
+1. **Login:** Access admin dashboard
+2. **Manage Data:** Add/edit students, staff, FAQs
+3. **Reconcile Payments:** Confirm or reject payment requests
+4. **Send Notifications:** Create announcements for users
+5. **Monitor Communications:** View chat logs and WhatsApp messages
+
+## API Endpoints
+
+### Public Endpoints
+- `GET /` - Main chatbot interface
+- `POST /api/chat` - Chat API
+- `GET /api/faqs` - Get all FAQs
+- `GET /api/fees` - Fee information
+- `GET /api/admissions` - Admission requirements
+- `GET /api/school-info` - School contact details
+
+### Authentication Required
+- `GET /dashboard` - User dashboard
+- `GET /payments` - Payment portal
+- `GET /notifications` - User notifications
+- `GET /voice` - Voice assistant
+
+### Admin Only
+- `GET /admin` - Admin dashboard
+- `GET /admin/students` - Student management
+- `GET /admin/staff` - Staff management
+- `GET /admin/payments` - Payment reconciliation
+- `GET /admin/whatsapp` - WhatsApp inbox
+
+### Webhooks
+- `POST /whatsapp/webhook` - WhatsApp message receiver
+- `POST /api/mobile-money/callback` - Payment confirmation callback
+
+## Deployment
+
+The application is configured for deployment on:
+- **Heroku** (using `Procfile`)
+- **Render** (using `render.yaml`)
+- **Local** (using `run.bat` or `run.sh`)
+
+Set environment variables in your deployment platform's dashboard.
+
 
 1. **Open the chatbot** in your web browser
 2. **Ask questions** about:

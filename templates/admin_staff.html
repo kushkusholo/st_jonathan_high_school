@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Staff - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Manage Staff</h1>
+            <p>Add, view, and manage staff records.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="add-form">
+                <h2>Add New Staff</h2>
+                <form method="POST" action="{{ url_for('admin_add_staff') }}">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="role">Role</label>
+                    <input type="text" id="role" name="role" required>
+
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone">
+
+                    <button type="submit" class="send-btn">Add Staff</button>
+                </form>
+            </section>
+
+            <section class="records-list">
+                <h2>Current Staff</h2>
+                {% if staff %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Phone</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in staff %}
+                                <tr>
+                                    <td>{{ member.id }}</td>
+                                    <td>{{ member.name }}</td>
+                                    <td>{{ member.email }}</td>
+                                    <td>{{ member.role }}</td>
+                                    <td>{{ member.phone or 'N/A' }}</td>
+                                    <td>{{ member.joined_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('admin_delete_staff', staff_id=member.id) }}" style="display:inline;">
+                                            <button type="submit" class="utility-btn" onclick="return confirm('Delete this staff member?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No staff yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admissions - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Admissions</h1>
+                <p>Apply to St. Jonathan High School for S.1 through O-Level.</p>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="admissions-info">
+                <h2>Application Requirements</h2>
+                <ul>
+                    <li>Completed application form</li>
+                    <li>Primary Leaving Certificate or PSLC</li>
+                    <li>Previous school report</li>
+                    <li>Birth certificate or national ID</li>
+                    <li>Parent/guardian consent</li>
+                    <li>Medical form</li>
+                </ul>
+
+                <p>To start your application, download the admission form below and submit it to the school office.</p>
+                <a class="utility-btn" href="{{ url_for('static', filename='admission_form.txt') }}" download>Download Admission Form</a>
+
+                <h2>Contact Admissions</h2>
+                <p>Phone: <a href="tel:{{ school_info.phone }}">{{ school_info.phone }}</a></p>
+                <p>Email: <a href="mailto:{{ school_info.email }}">{{ school_info.email }}</a></p>
+                <p>Address: {{ school_info.address }}</p>
+
+                <p><a class="utility-btn" href="/">Back to Chatbot</a></p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

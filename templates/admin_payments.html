@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Reconciliation - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Payment Reconciliation</h1>
+            <p>Review and confirm payment requests from parents.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="payments-list">
+                <h2>All Payments</h2>
+                {% if payments %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.id }}</td>
+                                    <td>{{ payment.user.name }} ({{ payment.user.email }})</td>
+                                    <td>UGX {{ payment.amount }}</td>
+                                    <td>{{ payment.method }}</td>
+                                    <td>{{ payment.reference or 'N/A' }}</td>
+                                    <td class="status-{{ payment.status }}">{{ payment.status | capitalize }}</td>
+                                    <td>{{ payment.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if payment.status == 'pending' %}
+                                            <form method="POST" action="{{ url_for('admin_confirm_payment', payment_id=payment.id) }}" style="display:inline;">
+                                                <button type="submit" class="utility-btn" style="background-color: #28a745;">Confirm</button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('admin_reject_payment', payment_id=payment.id) }}" style="display:inline;">
+                                                <button type="submit" class="utility-btn" style="background-color: #dc3545;" onclick="return confirm('Reject this payment?')">Reject</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No payments yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="payment-summary">
+                <h2>Summary</h2>
+                <p>Pending: {{ pending_count }}</p>
+                <p>Confirmed: {{ confirmed_count }}</p>
+                <p>Rejected: {{ rejected_count }}</p>
+                <p>Total Amount Confirmed: UGX {{ total_confirmed | round(2) }}</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

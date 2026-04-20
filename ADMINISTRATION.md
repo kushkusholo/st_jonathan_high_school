@@ -287,7 +287,7 @@ Edit `templates/index.html` to modify the welcome message that appears when the 
 ## 📞 Support Contacts
 
 **For Chatbot Support:**
-- Contact IT Department at +256325516717
+- Contact IT Department at +2563
 - Email: tech@stjonathan.ug
 
 **For Content Updates:**

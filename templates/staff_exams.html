@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Exams - Staff</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Exam Management</h1>
+            <p>Record and view student exam results.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="add-exam">
+                <h2>Record Exam Result</h2>
+                <form method="POST" action="{{ url_for('staff_add_exam') }}">
+                    <label for="student_id">Student</label>
+                    <select id="student_id" name="student_id" required>
+                        <option value="">Select Student</option>
+                        {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.name }} ({{ student.class_level }})</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" required>
+
+                    <label for="score">Score</label>
+                    <input type="number" id="score" name="score" step="0.01" required>
+
+                    <label for="grade">Grade</label>
+                    <input type="text" id="grade" name="grade">
+
+                    <label for="term">Term</label>
+                    <input type="text" id="term" name="term">
+
+                    <label for="year">Year</label>
+                    <input type="text" id="year" name="year">
+
+                    <button type="submit" class="send-btn">Record Exam</button>
+                </form>
+            </section>
+
+            <section class="exam-list">
+                <h2>Recent Exam Results</h2>
+                {% if exams %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Subject</th>
+                                <th>Score</th>
+                                <th>Grade</th>
+                                <th>Term</th>
+                                <th>Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in exams %}
+                                <tr>
+                                    <td>{{ exam.student.name }}</td>
+                                    <td>{{ exam.subject }}</td>
+                                    <td>{{ exam.score }}</td>
+                                    <td>{{ exam.grade or 'N/A' }}</td>
+                                    <td>{{ exam.term or 'N/A' }}</td>
+                                    <td>{{ exam.year or 'N/A' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No exam records yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

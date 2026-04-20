@@ -22,6 +22,9 @@
                 <div class="principal-info">
                     <p><strong>Principal:</strong> {{ school_info.principal }}</p>
                     <p><strong>Established:</strong> {{ school_info.established }}</p>
+                    <p><a class="utility-btn" href="/admin/login">Admin Dashboard</a></p>
+                    <p><a class="utility-btn" href="/auth/login">Portal Login</a></p>
+                    <p><a class="utility-btn" href="/auth/register">Register</a></p>
                 </div>
             </div>
         </header>
@@ -59,6 +62,13 @@
                     <h3>🛠️ Utilities</h3>
                     <button class="utility-btn" onclick="clearChat()">Clear Chat</button>
                     <button class="utility-btn" onclick="viewFAQs()">View All FAQs</button>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🚀 Quick Services</h3>
+                    <button class="suggestion-btn" onclick="sendMessage('What is the school fee structure?')">Check Fees</button>
+                    <button class="suggestion-btn" onclick="window.location.href='/admissions'">Apply Now</button>
+                    <button class="suggestion-btn" onclick="sendMessage('How can I contact the school?')">Contact School</button>
                 </div>
             </aside>
 

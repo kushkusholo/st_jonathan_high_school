@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container admin-login-container">
+        <header class="header">
+            <h1>Admin Login</h1>
+            <p>Manage FAQs and view chatbot content.</p>
+        </header>
+
+        <main class="admin-login-card">
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('admin_login') }}">
+                <label for="password">Admin Password</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit" class="send-btn">Login</button>
+            </form>
+            <p><a href="/">Back to Chatbot</a></p>
+        </main>
+    </div>
+</body>
+</html>
