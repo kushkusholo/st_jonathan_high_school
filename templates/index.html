@@ -29,7 +29,11 @@
         <!-- Main Chat Container -->
         <div class="chat-container">
             <!-- Info Panel -->
-            <aside class="info-panel">
+            <aside class="info-panel" id="infoPanel">
+                <div class="panel-header">
+                    <h3>📞 Quick Contact & Suggestions</h3>
+                    <button class="toggle-btn" id="togglePanel" onclick="toggleInfoPanel()">✕</button>
+                </div>
                 <div class="panel-section">
                     <h3>📞 Quick Contact</h3>
                     <div class="contact-info">
@@ -61,6 +65,7 @@
             <!-- Chat Window -->
             <main class="chat-window">
                 <div class="chat-header">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleInfoPanel()">☰</button>
                     <h2>🤖 School Assistant Chatbot</h2>
                     <p>Ask me anything about St. Jonathan High School</p>
                 </div>

@@ -17,21 +17,38 @@ SCHOOL_INFO = {
     "name": "St. Jonathan High School",
     "address": "P.O. Box 12352, Kampala",
     "location": "Jinja-Kampala Highway, next to Mbalala Trading Centre",
-    "phone": "+256325516717",
+    "phone": "+256701416197",
     "email": "info@stjJonathan.ug",
-    "established": 2010,
-    "principal": "Dr. Samuel Mugisha"
+    "established": 2017,
+    "principal": "Dr. MAIKI PROTUS"
 }
 
 # Load FAQs
 def load_faqs():
-    faq_path = os.path.join(os.path.dirname(__file__), 'data', 'faqs.json')
-    if os.path.exists(faq_path):
-        with open(faq_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+    # Try multiple paths
+    possible_paths = [
+        os.path.join(os.path.dirname(__file__), 'data', 'faqs.json'),
+        os.path.join(os.path.dirname(__file__), 'faqs.json'),
+        '/home/maikiprotus81/school_chatbot/data/faqs.json',
+        '/home/maikiprotus81/school_chatbot/faqs.json',
+    ]
+    
+    for faq_path in possible_paths:
+        if os.path.exists(faq_path):
+            try:
+                with open(faq_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Error loading {faq_path}: {e}")
+    
+    print("Warning: faqs.json not found at any location")
     return []
 
 FAQS = load_faqs()
+
+# Deployment settings
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('1', 'true', 'yes')
+PORT = int(os.environ.get('PORT', 5000))
 
 # Utility Functions
 def similar(a, b):
@@ -180,4 +197,4 @@ def log_conversation(user_msg, bot_response):
         json.dump(logs, f, indent=2, ensure_ascii=False)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    app.run(debug=DEBUG, host='0.0.0.0', port=PORT)

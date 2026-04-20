@@ -229,6 +229,20 @@ window.addEventListener('load', () => {
     document.getElementById('userInput').focus();
 });
 
+// Toggle info panel on mobile
+function toggleInfoPanel() {
+    const panel = document.getElementById('infoPanel');
+    const toggleBtn = document.getElementById('togglePanel');
+    
+    if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        toggleBtn.textContent = '✕';
+    } else {
+        panel.classList.add('hidden');
+        toggleBtn.textContent = '☰';
+    }
+}
+
 // Add some example quick questions
 const quickQuestions = [
     'What are the admission requirements?',
