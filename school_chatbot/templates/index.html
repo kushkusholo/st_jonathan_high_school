@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>St. Jonathan High School - Parent Portal Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="school-info">
+                    <h1>📚 {{ school_info.name }}</h1>
+                    <p class="school-details">
+                        <span>{{ school_info.address }}</span> | 
+                        <span>📞 {{ school_info.phone }}</span>
+                    </p>
+                    <p class="school-location">📍 {{ school_info.location }}</p>
+                </div>
+                <div class="principal-info">
+                    <p><strong>Principal:</strong> {{ school_info.principal }}</p>
+                    <p><strong>Established:</strong> {{ school_info.established }}</p>
+                    <p><a class="utility-btn" href="{{ url_for('portal_home') }}">All Portals</a></p>
+                    <p><a class="utility-btn" href="/admin/login">Admin Dashboard</a></p>
+                    <p><a class="utility-btn" href="/auth/login">Portal Login</a></p>
+                    <p><a class="utility-btn" href="/auth/register">Register</a></p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Chat Container -->
+        <div class="chat-container">
+            <!-- Info Panel -->
+            <aside class="info-panel" id="infoPanel">
+                <div class="panel-header">
+                    <h3>📞 Quick Contact & Suggestions</h3>
+                    <button class="toggle-btn" id="togglePanel" onclick="toggleInfoPanel()">✕</button>
+                </div>
+                <div class="panel-section">
+                    <h3>📞 Quick Contact</h3>
+                    <div class="contact-info">
+                        <p><strong>Phone:</strong> <a href="tel:+256325516717">{{ school_info.phone }}</a></p>
+                        <p><strong>Email:</strong> <a href="mailto:info@stjonathan.ug">{{ school_info.email }}</a></p>
+                        <p><strong>Address:</strong> {{ school_info.address }}</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>❓ Try Asking About:</h3>
+                    <div class="suggestions">
+                        <button class="suggestion-btn" onclick="sendMessage('What are the admission requirements?')">Admissions</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What is the school fee structure?')">Fees & Payments</button>
+                        <button class="suggestion-btn" onclick="sendMessage('When are the school holidays?')">Academic Calendar</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What subjects are offered?')">Subjects</button>
+                        <button class="suggestion-btn" onclick="sendMessage('Does the school provide boarding?')">Boarding</button>
+                        <button class="suggestion-btn" onclick="sendMessage('What extracurricular activities are available?')">Activities</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🛠️ Utilities</h3>
+                    <button class="utility-btn" onclick="clearChat()">Clear Chat</button>
+                    <button class="utility-btn" onclick="viewFAQs()">View All FAQs</button>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🚀 Quick Services</h3>
+                    <button class="suggestion-btn" onclick="sendMessage('What is the school fee structure?')">Check Fees</button>
+                    <button class="suggestion-btn" onclick="window.location.href='/admissions'">Apply Now</button>
+                    <button class="suggestion-btn" onclick="sendMessage('How can I contact the school?')">Contact School</button>
+                </div>
+            </aside>
+
+            <!-- Chat Window -->
+            <main class="chat-window">
+                <div class="chat-header">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleInfoPanel()">☰</button>
+                    <h2>🤖 School Assistant Chatbot</h2>
+                    <p>Ask me anything about St. Jonathan High School</p>
+                </div>
+
+                <div id="chatbox" class="chatbox">
+                    <div class="message bot-message welcome-message">
+                        <div class="message-content">
+                            <p><strong>Welcome to St. Jonathan High School!</strong></p>
+                            <p>I'm your school assistant, ready to help parents and guardians with information about admissions, fees, academic programs, facilities, and more.</p>
+                            <p>Feel free to ask any questions about our school. What would you like to know?</p>
+                        </div>
+                        <span class="timestamp">Just now</span>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <form id="chatForm" onsubmit="handleSubmit(event)">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="userInput" 
+                                placeholder="Type your question here..." 
+                                autocomplete="off"
+                                required
+                            >
+                            <button type="submit" class="send-btn">Send</button>
+                        </div>
+                    </form>
+                    <small class="info-text">💡 Type your question or choose a suggestion from the left panel</small>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- FAQs Modal -->
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFAQs()">&times;</span>
+            <h2>📋 All FAQs</h2>
+            <div id="faqList" class="faq-list"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

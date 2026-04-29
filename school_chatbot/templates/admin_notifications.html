@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Notifications - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Manage Notifications</h1>
+            <p>Create and manage school announcements and reminders.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="add-form">
+                <h2>Create New Notification</h2>
+                <form method="POST" action="{{ url_for('admin_add_notification') }}">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" required>
+
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+
+                    <label for="recipient_role">Recipient Role</label>
+                    <select id="recipient_role" name="recipient_role">
+                        <option value="all">All Users</option>
+                        <option value="parent">Parents</option>
+                        <option value="student">Students</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admins</option>
+                    </select>
+
+                    <button type="submit" class="send-btn">Create Notification</button>
+                </form>
+            </section>
+
+            <section class="records-list">
+                <h2>Recent Notifications</h2>
+                {% if notifications %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>Recipient</th>
+                                <th>Created</th>
+                                <th>Sent</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for note in notifications %}
+                                <tr>
+                                    <td>{{ note.id }}</td>
+                                    <td>{{ note.title }}</td>
+                                    <td>{{ note.message }}</td>
+                                    <td>{{ note.recipient_role }}</td>
+                                    <td>{{ note.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ 'Yes' if note.sent else 'No' }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('admin_delete_notification', notification_id=note.id) }}" style="display:inline;">
+                                            <button type="submit" class="utility-btn" onclick="return confirm('Delete this notification?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No notifications yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

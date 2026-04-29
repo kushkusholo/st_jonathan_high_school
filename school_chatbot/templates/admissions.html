@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Admissions - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Online Admission Form</h1>
+                <p>Apply to St. Jonathan High School and submit admission fee payment details online.</p>
+            </div>
+            <div class="admin-actions">
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+                <a class="utility-btn" href="{{ url_for('auth_login') }}">Parent Portal</a>
+            </div>
+        </header>
+
+        <main class="chat-window form-page">
+            {% if message %}
+                <div class="success-message">{{ message }}</div>
+            {% endif %}
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+
+            <section class="admissions-info">
+                <h2>Application Requirements</h2>
+                <ul>
+                    <li>Primary Leaving Certificate or PSLC</li>
+                    <li>Previous school report</li>
+                    <li>Birth certificate or national ID</li>
+                    <li>Parent/guardian consent</li>
+                    <li>Medical information</li>
+                    <li>Admission fee payment proof</li>
+                </ul>
+            </section>
+
+            <form method="POST" action="{{ url_for('admissions_page') }}" class="online-admission-form">
+                <section class="form-section">
+                    <h2>Student Information</h2>
+                    <div class="form-grid">
+                        <label>Full Name of Student
+                            <input type="text" name="student_name" required>
+                        </label>
+                        <label>Class Applying For
+                            <select name="class_level" required>
+                                <option value="">Select class</option>
+                                <option>S.1</option>
+                                <option>S.2</option>
+                                <option>S.3</option>
+                                <option>S.4</option>
+                                <option>O-Level</option>
+                            </select>
+                        </label>
+                        <label>Date of Birth
+                            <input type="date" name="date_of_birth">
+                        </label>
+                        <label>Gender
+                            <select name="gender">
+                                <option value="">Select gender</option>
+                                <option>Female</option>
+                                <option>Male</option>
+                            </select>
+                        </label>
+                        <label>Previous School
+                            <input type="text" name="previous_school">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2>Parent / Guardian Information</h2>
+                    <div class="form-grid">
+                        <label>Parent/Guardian Full Name
+                            <input type="text" name="parent_name" required>
+                        </label>
+                        <label>Phone Number
+                            <input type="tel" name="parent_phone" required>
+                        </label>
+                        <label>Email Address
+                            <input type="email" name="parent_email">
+                        </label>
+                        <label>Home Address
+                            <textarea name="home_address" rows="3"></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2>Emergency & Medical Information</h2>
+                    <div class="form-grid">
+                        <label>Emergency Contact Name
+                            <input type="text" name="emergency_name">
+                        </label>
+                        <label>Emergency Contact Phone
+                            <input type="tel" name="emergency_phone">
+                        </label>
+                        <label>Medical Notes
+                            <textarea name="medical_notes" rows="3" placeholder="Allergies, medication, health conditions"></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2>Admission Fee Payment</h2>
+                    <p>Create a payment request in the parent portal first, then enter the payment reference and mobile money transaction ID here.</p>
+                    <div class="form-grid">
+                        <label>Admission Fee Amount (UGX)
+                            <input type="number" name="admission_fee_amount" step="1000">
+                        </label>
+                        <label>Payment Method
+                            <select name="payment_method">
+                                <option value="">Select method</option>
+                                <option>MTN Mobile Money</option>
+                                <option>Airtel Money Uganda</option>
+                                <option>Bank Transfer</option>
+                                <option>Cash</option>
+                            </select>
+                        </label>
+                        <label>Payment Reference Number
+                            <input type="text" name="payment_reference" placeholder="PAY-YYYYMMDDHHMMSS-ID">
+                        </label>
+                        <label>Mobile Money Transaction ID
+                            <input type="text" name="transaction_id">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="payment-steps-grid">
+                    <div class="payment-step-card">
+                        <h3>1. Create Reference</h3>
+                        <ol>
+                            <li>Login to the parent portal.</li>
+                            <li>Open Payments.</li>
+                            <li>Enter the admission fee amount.</li>
+                            <li>Create the payment request.</li>
+                        </ol>
+                    </div>
+                    <div class="payment-step-card">
+                        <h3>2. MTN Mobile Money</h3>
+                        <ol>
+                            <li>Dial *165#.</li>
+                            <li>Select Payments.</li>
+                            <li>Select School Fees or Pay Bill.</li>
+                            <li>Enter amount and reference.</li>
+                            <li>Confirm with your PIN.</li>
+                        </ol>
+                    </div>
+                    <div class="payment-step-card">
+                        <h3>3. Airtel Money</h3>
+                        <ol>
+                            <li>Dial *185#.</li>
+                            <li>Select Payments.</li>
+                            <li>Select School Fees or Pay Bill.</li>
+                            <li>Enter amount and reference.</li>
+                            <li>Confirm with your PIN.</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <div class="form-actions">
+                    <button type="submit" class="send-btn">Submit Admission Application</button>
+                    <a class="utility-btn" href="{{ url_for('payments') }}">Create Payment Request</a>
+                </div>
+            </form>
+
+            <section class="admissions-info">
+                <h2>Contact Admissions</h2>
+                <p>Phone: <a href="tel:{{ school_info.phone }}">{{ school_info.phone }}</a></p>
+                <p>Email: <a href="mailto:{{ school_info.email }}">{{ school_info.email }}</a></p>
+                <p>Address: {{ school_info.address }}</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

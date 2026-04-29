@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Portals - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container portal-shell">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>St. Jonathan High School Portals</h1>
+                    <p>Choose the portal that matches your role.</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="/">Chatbot</a>
+                    <a class="utility-btn" href="{{ url_for('auth_login') }}">Login</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="portal-grid">
+            <a class="portal-card" href="{{ url_for('admin_login') }}">
+                <span>Admin</span>
+                <strong>Admin Portal</strong>
+                <p>Manage students, staff, FAQs, payments, notices, and records.</p>
+            </a>
+            <a class="portal-card" href="{{ url_for('auth_login') }}">
+                <span>Parent</span>
+                <strong>Parent Portal</strong>
+                <p>Track children, payments, notifications, admissions, and support contacts.</p>
+            </a>
+            <a class="portal-card" href="{{ url_for('auth_login') }}">
+                <span>Student</span>
+                <strong>Student Portal</strong>
+                <p>View marks, timetable, reminders, library books, and counselor contacts.</p>
+            </a>
+            <a class="portal-card" href="{{ url_for('auth_login') }}">
+                <span>Teacher</span>
+                <strong>Teacher Portal</strong>
+                <p>Record marks, manage attendance, view learners, and follow class reminders.</p>
+            </a>
+        </main>
+    </div>
+</body>
+</html>

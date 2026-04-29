@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Teacher Portal</h1>
+                    <p>Welcome, {{ current_user.name }}. Manage teaching tasks and student records.</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="{{ url_for('staff_attendance') }}">Attendance</a>
+                    <a class="utility-btn" href="{{ url_for('staff_exams') }}">Marks</a>
+                    <a class="utility-btn" href="{{ url_for('auth_logout') }}">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main portal-main">
+            <section class="dashboard-card dashboard-wide student-hero-card">
+                <div>
+                    <h2>Teaching Workspace</h2>
+                    <p>Quick access to learners, marks, class schedule, reminders, and notices.</p>
+                </div>
+                <div class="dashboard-actions compact-actions">
+                    <a class="suggestion-btn" href="/">Ask Chatbot</a>
+                    <a class="suggestion-btn" href="{{ url_for('notifications') }}">Notifications</a>
+                    <a class="suggestion-btn" href="{{ url_for('portal_home') }}">All Portals</a>
+                </div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Enter Marks</h2>
+                <form method="POST" action="{{ url_for('teacher_add_mark') }}" class="portal-form">
+                    <label>Student
+                        <select name="student_id" required>
+                            <option value="">Select student</option>
+                            {% for student in students %}
+                                <option value="{{ student.id }}">{{ student.name }} ({{ student.class_level }})</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Subject
+                        <input type="text" name="subject" required>
+                    </label>
+                    <label>Score
+                        <input type="number" name="score" step="0.01" required>
+                    </label>
+                    <label>Grade
+                        <input type="text" name="grade">
+                    </label>
+                    <label>Term
+                        <input type="text" name="term" placeholder="Term 1">
+                    </label>
+                    <label>Year
+                        <input type="text" name="year" placeholder="2026">
+                    </label>
+                    <button type="submit" class="send-btn">Save Mark</button>
+                </form>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Add Student Comment</h2>
+                <form method="POST" action="{{ url_for('teacher_add_comment') }}" class="portal-form">
+                    <label>Student
+                        <select name="student_id" required>
+                            <option value="">Select student</option>
+                            {% for student in students %}
+                                <option value="{{ student.id }}">{{ student.name }} ({{ student.class_level }})</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Comment Type
+                        <select name="category">
+                            <option>Academic</option>
+                            <option>Discipline</option>
+                            <option>Attendance</option>
+                            <option>General</option>
+                        </select>
+                    </label>
+                    <label>Comment
+                        <textarea name="comment" rows="4" required></textarea>
+                    </label>
+                    <button type="submit" class="send-btn">Save Comment</button>
+                </form>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Students</h2>
+                {% for student in students %}
+                    <div class="mini-row">
+                        <span>{{ student.class_level }}</span>
+                        <strong>{{ student.name }}</strong>
+                        <small>Admission Year: {{ student.admission_year or 'N/A' }}</small>
+                    </div>
+                {% else %}
+                    <p>No students available yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Recent Marks</h2>
+                {% for mark in recent_marks %}
+                    <div class="mini-row">
+                        <span>{{ mark.student.name if mark.student else 'Student' }}</span>
+                        <strong>{{ mark.subject }} - {{ mark.score }}{% if mark.grade %} {{ mark.grade }}{% endif %}</strong>
+                        <small>{{ mark.term or 'Term' }} {{ mark.year or '' }}</small>
+                    </div>
+                {% else %}
+                    <p>No marks recorded yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Recent Comments</h2>
+                {% for item in recent_comments %}
+                    <div class="mini-row">
+                        <span>{{ item.student.name if item.student else 'Student' }} | {{ item.category }}</span>
+                        <strong>{{ item.comment }}</strong>
+                        <small>{{ item.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                {% else %}
+                    <p>No comments recorded yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Class Timetable</h2>
+                {% for item in timetable %}
+                    <div class="mini-row">
+                        <span>{{ item.class_level }} | {{ item.day_of_week }} P{{ item.period }}</span>
+                        <strong>{{ item.subject }}</strong>
+                        <small>{{ item.start_time }} - {{ item.end_time }}{% if item.room %} | {{ item.room }}{% endif %}</small>
+                    </div>
+                {% else %}
+                    <p>No timetable entries available yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Reminders</h2>
+                {% for reminder in reminders %}
+                    <div class="mini-row">
+                        <span>{{ reminder.class_level }} | {{ reminder.subject }}</span>
+                        <strong>{{ reminder.title }}</strong>
+                        <small>Due {{ reminder.due_date.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                {% else %}
+                    <p>No reminders yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card dashboard-wide">
+                <h2>Staff Notices</h2>
+                {% if notices %}
+                    <div class="library-grid">
+                        {% for notice in notices %}
+                            <div class="book-card">
+                                <strong>{{ notice.title }}</strong>
+                                <p>{{ notice.message }}</p>
+                                <small>{{ notice.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No staff notices yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container admin-dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Admin Dashboard</h1>
+                <p>Manage FAQs and keep the chatbot knowledge base up to date.</p>
+            </div>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_students') }}">Manage Students</a>
+                <a class="utility-btn" href="{{ url_for('admin_staff') }}">Manage Staff</a>
+                <a class="utility-btn" href="{{ url_for('admin_notifications') }}">Manage Notifications</a>
+                <a class="utility-btn" href="{{ url_for('admin_payments') }}">Payment Reconciliation</a>
+                <a class="utility-btn" href="{{ url_for('admin_whatsapp') }}">WhatsApp Inbox</a>
+                <a class="utility-btn" href="{{ url_for('admin_logs') }}">View Chat Logs</a>
+                <a class="utility-btn" href="{{ url_for('admin_logout') }}">Logout</a>
+                <a class="utility-btn" href="/">View Chatbot</a>
+            </div>
+        </header>
+
+        <main class="admin-panel">
+            <section class="faq-management">
+                <h2>Current FAQs</h2>
+                <div class="faq-table">
+                    {% for faq in faqs %}
+                        <div class="faq-row">
+                            <div class="faq-meta">
+                                <strong>{{ faq.question }}</strong>
+                                <span class="faq-category">{{ faq.category }}</span>
+                            </div>
+                            <div class="faq-actions">
+                                <form method="POST" action="{{ url_for('admin_delete_faq', faq_id=faq.id) }}">
+                                    <button type="submit" class="delete-btn">Delete</button>
+                                </form>
+                            </div>
+                            <p>{{ faq.answer }}</p>
+                        </div>
+                    {% else %}
+                        <p>No FAQs available.</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="faq-add">
+                <h2>Add New FAQ</h2>
+                <form method="POST" action="{{ url_for('admin_add_faq') }}">
+                    <label for="question">Question</label>
+                    <input type="text" id="question" name="question" required>
+
+                    <label for="answer">Answer</label>
+                    <textarea id="answer" name="answer" rows="6" required></textarea>
+
+                    <label for="category">Category</label>
+                    <input type="text" id="category" name="category" placeholder="Admissions, Fees & Payments, Academics, etc." required>
+
+                    <label for="keywords">Keywords (comma separated)</label>
+                    <input type="text" id="keywords" name="keywords" placeholder="fees, cost, tuition">
+
+                    <button type="submit" class="send-btn">Add FAQ</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

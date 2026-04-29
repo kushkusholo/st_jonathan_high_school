@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Welcome, {{ current_user.name }}</h1>
+                    <p>Role: {{ current_user.role | capitalize }}</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="{{ url_for('auth_logout') }}">Logout</a>
+                    <a class="utility-btn" href="/">Back to Chatbot</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            {% if role == 'admin' %}
+                <section class="dashboard-card dashboard-wide">
+                    <h2>Admin Summary</h2>
+                    <div class="dashboard-stats">
+                        <span>Students: {{ student_count }}</span>
+                        <span>Staff: {{ staff_count }}</span>
+                        <span>Payments: {{ payment_count }}</span>
+                    </div>
+                    <div class="dashboard-actions">
+                        <a class="suggestion-btn" href="{{ url_for('admin_students') }}">Manage Students</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_staff') }}">Manage Staff</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_notifications') }}">Manage Notifications</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_dashboard') }}">Manage FAQs</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_logs') }}">View Chat Logs</a>
+                    </div>
+                </section>
+            {% elif role == 'staff' %}
+                <section class="dashboard-card dashboard-wide">
+                    <h2>Staff Portal</h2>
+                    <p>Manage attendance, exams, payments, reminders, and communication.</p>
+                    <div class="dashboard-actions">
+                        <a class="suggestion-btn" href="{{ url_for('staff_attendance') }}">Manage Attendance</a>
+                        <a class="suggestion-btn" href="{{ url_for('staff_exams') }}">Manage Exams</a>
+                        <a class="suggestion-btn" href="{{ url_for('admin_whatsapp') }}">WhatsApp Messages</a>
+                        <a class="suggestion-btn" href="{{ url_for('payments') }}">Payments</a>
+                        <a class="suggestion-btn" href="{{ url_for('notifications') }}">Notifications</a>
+                        <a class="suggestion-btn" href="{{ url_for('voice_page') }}">Voice Assistant</a>
+                    </div>
+                </section>
+            {% else %}
+                <section class="dashboard-card dashboard-wide student-hero-card">
+                    <div>
+                        <h2>Student Interaction Dashboard</h2>
+                        {% if student %}
+                            <p>{{ student.name }} - {{ student.class_level }}{% if student.admission_year %} - {{ student.admission_year }}{% endif %}</p>
+                        {% else %}
+                            <p>View school updates, learning resources, and support contacts.</p>
+                        {% endif %}
+                    </div>
+                    <div class="dashboard-actions compact-actions">
+                        <a class="suggestion-btn" href="{{ url_for('payments') }}">Fees & Payments</a>
+                        <a class="suggestion-btn" href="{{ url_for('notifications') }}">All Notifications</a>
+                        <a class="suggestion-btn" href="{{ url_for('voice_page') }}">Voice Assistant</a>
+                    </div>
+                </section>
+
+                {% if child_students %}
+                    <section class="dashboard-card">
+                        <h2>Linked Students</h2>
+                        {% for child in child_students %}
+                            <div class="record-card">
+                                <strong>{{ child.name }}</strong>
+                                <p>Class: {{ child.class_level }}</p>
+                                <p>Admission Year: {{ child.admission_year or 'N/A' }}</p>
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+
+                <section class="dashboard-card">
+                    <h2>Marks</h2>
+                    {% if marks %}
+                        <div class="marks-list">
+                            {% for mark in marks %}
+                                <div class="mini-row">
+                                    <span>{{ mark.subject }}</span>
+                                    <strong>{{ mark.score }}{% if mark.grade %} - {{ mark.grade }}{% endif %}</strong>
+                                    <small>{{ mark.term or 'Term' }} {{ mark.year or '' }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No marks available yet.</p>
+                    {% endif %}
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Notifications</h2>
+                    {% if notices %}
+                        <div class="notification-list">
+                            {% for notice in notices[:4] %}
+                                <div class="notification-card compact-card">
+                                    <h3>{{ notice.title }}</h3>
+                                    <p>{{ notice.message }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No notifications yet.</p>
+                    {% endif %}
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Timetable</h2>
+                    {% if timetable %}
+                        <div class="timetable-list">
+                            {% for item in timetable %}
+                                <div class="mini-row">
+                                    <span>{{ item.day_of_week }} P{{ item.period }}</span>
+                                    <strong>{{ item.subject }}</strong>
+                                    <small>{{ item.start_time }} - {{ item.end_time }}{% if item.room %} | {{ item.room }}{% endif %}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No timetable entries available yet.</p>
+                    {% endif %}
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Reminders</h2>
+                    {% if reminders %}
+                        {% for reminder in reminders %}
+                            <div class="mini-row">
+                                <strong>{{ reminder.title }}</strong>
+                                <small>{{ reminder.meta }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No upcoming assignments or exams.</p>
+                    {% endif %}
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>School Counselors</h2>
+                    {% if counselors %}
+                        {% for counselor in counselors %}
+                            <div class="record-card">
+                                <strong>{{ counselor.name }}</strong>
+                                <p>{{ counselor.role }}</p>
+                                <p><a href="tel:{{ counselor.phone }}">{{ counselor.phone }}</a></p>
+                                {% if counselor.available_days %}<p>{{ counselor.available_days }}</p>{% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Counselor contacts will appear here.</p>
+                    {% endif %}
+                </section>
+
+                <section class="dashboard-card dashboard-wide">
+                    <h2>Library Books</h2>
+                    {% if library_books %}
+                        <div class="library-grid">
+                            {% for book in library_books %}
+                                <div class="book-card">
+                                    <strong>{{ book.title }}</strong>
+                                    <p>{{ book.author or 'School Library' }}</p>
+                                    <small>{{ book.category or 'General' }} | {{ book.class_level or 'All classes' }}</small>
+                                    <small>{{ book.copies_available }} copies | {{ book.shelf_location or 'Library' }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Library books will appear here.</p>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

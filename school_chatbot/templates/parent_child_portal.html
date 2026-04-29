@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ student.name }} - Parent Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>{{ student.name }}'s Portal</h1>
+                    <p>{{ student.class_level }}{% if student.admission_year %} | Admission Year: {{ student.admission_year }}{% endif %}</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="{{ url_for('parent_portal') }}">All Children</a>
+                    <a class="utility-btn" href="{{ url_for('payments') }}">Payments</a>
+                    <a class="utility-btn" href="{{ url_for('auth_logout') }}">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main portal-main">
+            <section class="dashboard-card">
+                <h2>Marks</h2>
+                {% for mark in marks %}
+                    <div class="mini-row">
+                        <span>{{ mark.subject }}</span>
+                        <strong>{{ mark.score }}{% if mark.grade %} - {{ mark.grade }}{% endif %}</strong>
+                        <small>{{ mark.term or 'Term' }} {{ mark.year or '' }}</small>
+                    </div>
+                {% else %}
+                    <p>No marks available yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Teacher Comments</h2>
+                {% for item in comments %}
+                    <div class="mini-row">
+                        <span>{{ item.category }}</span>
+                        <strong>{{ item.comment }}</strong>
+                        <small>{{ item.created_at.strftime('%Y-%m-%d') }}{% if item.teacher %} | {{ item.teacher.name }}{% endif %}</small>
+                    </div>
+                {% else %}
+                    <p>No teacher comments yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Timetable</h2>
+                {% for item in timetable %}
+                    <div class="mini-row">
+                        <span>{{ item.day_of_week }} P{{ item.period }}</span>
+                        <strong>{{ item.subject }}</strong>
+                        <small>{{ item.start_time }} - {{ item.end_time }}{% if item.room %} | {{ item.room }}{% endif %}</small>
+                    </div>
+                {% else %}
+                    <p>No timetable entries available yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Reminders</h2>
+                {% for reminder in reminders %}
+                    <div class="mini-row">
+                        <strong>{{ reminder.title }}</strong>
+                        <small>{{ reminder.meta }}</small>
+                    </div>
+                {% else %}
+                    <p>No upcoming assignments or exams.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card dashboard-wide">
+                <h2>Notifications</h2>
+                <div class="library-grid">
+                    {% for notice in notices %}
+                        <div class="book-card">
+                            <strong>{{ notice.title }}</strong>
+                            <p>{{ notice.message }}</p>
+                            <small>{{ notice.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                    {% else %}
+                        <p>No notifications yet.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

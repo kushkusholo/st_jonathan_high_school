@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Attendance - Staff</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Attendance Management</h1>
+            <p>Record and view student attendance.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="add-attendance">
+                <h2>Record Attendance</h2>
+                <form method="POST" action="{{ url_for('staff_add_attendance') }}">
+                    <label for="student_id">Student</label>
+                    <select id="student_id" name="student_id" required>
+                        <option value="">Select Student</option>
+                        {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.name }} ({{ student.class_level }})</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" required>
+
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="present">Present</option>
+                        <option value="absent">Absent</option>
+                        <option value="late">Late</option>
+                    </select>
+
+                    <label for="remarks">Remarks</label>
+                    <input type="text" id="remarks" name="remarks">
+
+                    <button type="submit" class="send-btn">Record Attendance</button>
+                </form>
+            </section>
+
+            <section class="attendance-list">
+                <h2>Recent Attendance Records</h2>
+                {% if attendances %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for att in attendances %}
+                                <tr>
+                                    <td>{{ att.student.name }}</td>
+                                    <td>{{ att.date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ att.status | capitalize }}</td>
+                                    <td>{{ att.remarks or 'N/A' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No attendance records yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Student Portal</h1>
+                    <p>{% if student %}{{ student.name }} - {{ student.class_level }}{% else %}Welcome, {{ current_user.name }}{% endif %}</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="{{ url_for('notifications') }}">Notifications</a>
+                    <a class="utility-btn" href="{{ url_for('voice_page') }}">Voice Assistant</a>
+                    <a class="utility-btn" href="{{ url_for('auth_logout') }}">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main portal-main">
+            <section class="dashboard-card dashboard-wide student-hero-card">
+                <div>
+                    <h2>Learning Hub</h2>
+                    <p>Marks, timetable, reminders, books, and support in one place.</p>
+                </div>
+                <div class="dashboard-actions compact-actions">
+                    <a class="suggestion-btn" href="/">Ask Chatbot</a>
+                    <a class="suggestion-btn" href="{{ url_for('portal_home') }}">All Portals</a>
+                </div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Marks</h2>
+                {% if marks %}
+                    {% for mark in marks %}
+                        <div class="mini-row">
+                            <span>{{ mark.subject }}</span>
+                            <strong>{{ mark.score }}{% if mark.grade %} - {{ mark.grade }}{% endif %}</strong>
+                            <small>{{ mark.term or 'Term' }} {{ mark.year or '' }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No marks available yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Timetable</h2>
+                {% if timetable %}
+                    {% for item in timetable %}
+                        <div class="mini-row">
+                            <span>{{ item.day_of_week }} P{{ item.period }}</span>
+                            <strong>{{ item.subject }}</strong>
+                            <small>{{ item.start_time }} - {{ item.end_time }}{% if item.room %} | {{ item.room }}{% endif %}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No timetable entries available yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Teacher Comments</h2>
+                {% if comments %}
+                    {% for item in comments %}
+                        <div class="mini-row">
+                            <span>{{ item.category }}</span>
+                            <strong>{{ item.comment }}</strong>
+                            <small>{{ item.created_at.strftime('%Y-%m-%d') }}{% if item.teacher %} | {{ item.teacher.name }}{% endif %}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No teacher comments yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Reminders</h2>
+                {% if reminders %}
+                    {% for reminder in reminders %}
+                        <div class="mini-row">
+                            <strong>{{ reminder.title }}</strong>
+                            <small>{{ reminder.meta }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No upcoming assignments or exams.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Notifications</h2>
+                {% if notices %}
+                    {% for notice in notices[:5] %}
+                        <div class="notification-card compact-card">
+                            <h3>{{ notice.title }}</h3>
+                            <p>{{ notice.message }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No notifications yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Counselors</h2>
+                {% for counselor in counselors %}
+                    <div class="record-card">
+                        <strong>{{ counselor.name }}</strong>
+                        <p>{{ counselor.role }}</p>
+                        <p><a href="tel:{{ counselor.phone }}">{{ counselor.phone }}</a></p>
+                    </div>
+                {% else %}
+                    <p>Counselor contacts will appear here.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card dashboard-wide">
+                <h2>Library Books</h2>
+                <div class="library-grid">
+                    {% for book in library_books %}
+                        <div class="book-card">
+                            <strong>{{ book.title }}</strong>
+                            <p>{{ book.author or 'School Library' }}</p>
+                            <small>{{ book.category or 'General' }} | {{ book.class_level or 'All classes' }}</small>
+                            <small>{{ book.copies_available }} copies | {{ book.shelf_location or 'Library' }}</small>
+                        </div>
+                    {% else %}
+                        <p>Library books will appear here.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

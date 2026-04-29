@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Manage Students</h1>
+            <p>Add, view, and manage student records.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="add-form">
+                <h2>Add New Student</h2>
+                <form method="POST" action="{{ url_for('admin_add_student') }}">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="class_level">Class Level</label>
+                    <input type="text" id="class_level" name="class_level" required>
+
+                    <label for="admission_year">Admission Year</label>
+                    <input type="text" id="admission_year" name="admission_year">
+
+                    <label for="parent_id">Parent ID (optional)</label>
+                    <input type="number" id="parent_id" name="parent_id">
+
+                    <button type="submit" class="send-btn">Add Student</button>
+                </form>
+            </section>
+
+            <section class="records-list">
+                <h2>Current Students</h2>
+                {% if students %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Admission Year</th>
+                                <th>Parent</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                                <tr>
+                                    <td>{{ student.id }}</td>
+                                    <td>{{ student.name }}</td>
+                                    <td>{{ student.class_level }}</td>
+                                    <td>{{ student.admission_year or 'N/A' }}</td>
+                                    <td>{{ student.parent.name if student.parent else 'N/A' }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('admin_delete_student', student_id=student.id) }}" style="display:inline;">
+                                            <button type="submit" class="utility-btn" onclick="return confirm('Delete this student?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No students yet.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

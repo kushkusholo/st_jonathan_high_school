@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Voice Assistant</h1>
+            <p>Use your browser microphone to ask the school chatbot questions by voice.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <p>This feature uses the Web Speech API. Press the button to start voice recognition.</p>
+            <button id="voiceBtn" class="send-btn">Start Voice Input</button>
+            <p id="status">Ready to listen...</p>
+            {% if status_message %}
+                <div class="chat-response">
+                    <h2>Assistant Response</h2>
+                    <p>{{ status_message }}</p>
+                </div>
+            {% endif %}
+            <form id="voiceForm" method="POST" action="{{ url_for('voice_page') }}" style="display:none;">
+                <input type="hidden" name="message" id="voiceMessage">
+            </form>
+        </main>
+    </div>
+    <script>
+        const voiceBtn = document.getElementById('voiceBtn');
+        const status = document.getElementById('status');
+        const voiceMessage = document.getElementById('voiceMessage');
+        const voiceForm = document.getElementById('voiceForm');
+
+        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+            status.textContent = 'Speech recognition is not supported in this browser.';
+            voiceBtn.disabled = true;
+        } else {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                status.textContent = 'Listening...';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                status.textContent = 'Captured: ' + transcript;
+                voiceMessage.value = transcript;
+                voiceForm.submit();
+            };
+
+            recognition.onerror = (event) => {
+                status.textContent = 'Error: ' + event.error;
+            };
+
+            recognition.onend = () => {
+                if (!voiceMessage.value) {
+                    status.textContent = 'Click the button to try again.';
+                }
+            };
+
+            voiceBtn.addEventListener('click', () => {
+                recognition.start();
+            });
+        }
+    </script>
+</body>
+</html>

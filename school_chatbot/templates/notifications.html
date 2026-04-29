@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Notifications</h1>
+            <p>Important school announcements, reminders, and alerts.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            {% if notices %}
+                <div class="notification-list">
+                    {% for notice in notices %}
+                        <div class="notification-card">
+                            <h3>{{ notice.title }}</h3>
+                            <p>{{ notice.message }}</p>
+                            <span class="timestamp">{{ notice.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No notifications at this time.</p>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

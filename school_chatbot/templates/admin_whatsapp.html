@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Inbox - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>WhatsApp Inbox</h1>
+            <p>View and respond to WhatsApp messages from parents and students.</p>
+            <div class="admin-actions">
+                <a class="utility-btn" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+                <a class="utility-btn" href="/">Back to Chatbot</a>
+            </div>
+        </header>
+
+        <main class="chat-window" style="padding: 20px;">
+            <section class="messages-list">
+                <h2>Recent Messages</h2>
+                {% if messages %}
+                    <div class="whatsapp-messages">
+                        {% for msg in messages %}
+                            <div class="message-item {{ 'inbound' if msg.direction == 'inbound' else 'outbound' }}">
+                                <div class="message-header">
+                                    <strong>{{ msg.from_number }}</strong>
+                                    <span class="timestamp">{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                                    <span class="direction">{{ msg.direction | capitalize }}</span>
+                                </div>
+                                <p>{{ msg.message_body }}</p>
+                                {% if msg.direction == 'inbound' and not msg.responded %}
+                                    <button class="reply-btn" onclick="replyTo('{{ msg.from_number }}')">Reply</button>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No WhatsApp messages yet.</p>
+                {% endif %}
+            </section>
+
+            <section class="send-message" id="sendSection" style="display:none;">
+                <h2>Send Reply</h2>
+                <form id="whatsappForm">
+                    <label for="to">To:</label>
+                    <input type="text" id="to" readonly>
+
+                    <label for="message">Message:</label>
+                    <textarea id="message" rows="4" required></textarea>
+
+                    <button type="submit" class="send-btn">Send Message</button>
+                    <button type="button" onclick="cancelReply()" class="utility-btn">Cancel</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function replyTo(number) {
+            document.getElementById('to').value = number;
+            document.getElementById('sendSection').style.display = 'block';
+            document.getElementById('message').focus();
+        }
+
+        function cancelReply() {
+            document.getElementById('sendSection').style.display = 'none';
+            document.getElementById('whatsappForm').reset();
+        }
+
+        document.getElementById('whatsappForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const to = document.getElementById('to').value;
+            const message = document.getElementById('message').value;
+
+            fetch('/api/whatsapp/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ to: to, message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Message sent successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error sending message: ' + error);
+            });
+        });
+    </script>
+</body>
+</html>
