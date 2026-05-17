@@ -32,6 +32,12 @@ except ImportError:
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 if openai and OPENAI_API_KEY:
     openai.api_key = OPENAI_API_KEY
+    try:
+        openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    except AttributeError:
+        openai_client = None
+else:
+    openai_client = None
 
 AI_ENABLED = bool(openai and OPENAI_API_KEY)
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
@@ -444,6 +450,57 @@ class LibraryBook(db.Model):
     shelf_location = db.Column(db.String(80), nullable=True)
 
 
+class LabItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    item_type = db.Column(db.String(50), nullable=False)  # chemical, apparatus, equipment
+    quantity = db.Column(db.Float, default=0)
+    unit = db.Column(db.String(30), nullable=True)
+    location = db.Column(db.String(100), nullable=True)
+    safety_notes = db.Column(db.Text, nullable=True)
+    reorder_level = db.Column(db.Float, default=0)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @property
+    def is_low_stock(self):
+        return self.quantity <= self.reorder_level
+
+
+class LabExperiment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    class_level = db.Column(db.String(50), nullable=False)
+    objective = db.Column(db.Text, nullable=False)
+    materials = db.Column(db.Text, nullable=False)
+    procedure = db.Column(db.Text, nullable=False)
+    safety_precautions = db.Column(db.Text, nullable=False)
+    expected_result = db.Column(db.Text, nullable=True)
+
+
+class LabSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    experiment_id = db.Column(db.Integer, db.ForeignKey('lab_experiment.id'), nullable=False)
+    class_level = db.Column(db.String(50), nullable=False)
+    scheduled_date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.String(10), nullable=False)
+    end_time = db.Column(db.String(10), nullable=False)
+    laboratory = db.Column(db.String(80), default='Science Lab')
+    technician = db.Column(db.String(120), nullable=True)
+    experiment = db.relationship('LabExperiment', backref='schedules', lazy=True)
+
+
+class LabReport(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    experiment_id = db.Column(db.Integer, db.ForeignKey('lab_experiment.id'), nullable=False)
+    student_name = db.Column(db.String(120), nullable=False)
+    class_level = db.Column(db.String(50), nullable=False)
+    observations = db.Column(db.Text, nullable=False)
+    conclusion = db.Column(db.Text, nullable=False)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    experiment = db.relationship('LabExperiment', backref='reports', lazy=True)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -514,6 +571,63 @@ with app.app_context():
             ExamSchedule(class_level='S.3', subject='Biology', exam_date=date.today(), start_time='09:00', end_time='10:30', venue='Lab 2'),
         ])
         db.session.commit()
+    if LabItem.query.count() == 0:
+        db.session.add_all([
+            LabItem(name='Sodium hydroxide', item_type='chemical', quantity=2.5, unit='litres', location='Chemical Store A', reorder_level=1, safety_notes='Corrosive. Wear gloves and goggles. Rinse spills with plenty of water.'),
+            LabItem(name='Copper sulfate solution', item_type='chemical', quantity=1.8, unit='litres', location='Chemical Store A', reorder_level=1, safety_notes='Harmful if swallowed. Avoid skin contact and wash hands after use.'),
+            LabItem(name='Test tubes', item_type='apparatus', quantity=80, unit='pieces', location='Lab Cabinet 2', reorder_level=20, safety_notes='Handle glassware carefully and report breakages immediately.'),
+            LabItem(name='Bunsen burners', item_type='equipment', quantity=12, unit='pieces', location='Physics/Chemistry Lab', reorder_level=4, safety_notes='Check gas taps before and after practical lessons.'),
+            LabItem(name='Microscopes', item_type='equipment', quantity=10, unit='pieces', location='Biology Lab', reorder_level=3, safety_notes='Carry with two hands and clean lenses only with lens tissue.'),
+        ])
+        db.session.commit()
+    if LabExperiment.query.count() == 0:
+        biuret = LabExperiment(
+            title='Testing for Proteins Using the Biuret Test',
+            subject='Biology',
+            class_level='S.3',
+            objective='To identify the presence of proteins in a food sample.',
+            materials='Food sample solution, sodium hydroxide, copper sulfate solution, test tubes, dropper, test tube rack.',
+            procedure='Place 2 cm3 of the food sample in a test tube. Add 2 cm3 of sodium hydroxide and shake gently. Add a few drops of copper sulfate solution. Observe the colour change.',
+            safety_precautions='Wear goggles and gloves. Do not taste chemicals or food samples. Keep sodium hydroxide away from skin and eyes. Clean spills immediately.',
+            expected_result='A violet or purple colour shows that proteins are present.'
+        )
+        db.session.add_all([
+            biuret,
+            LabExperiment(
+                title='Preparing Oxygen Gas',
+                subject='Chemistry',
+                class_level='S.2',
+                objective='To prepare oxygen gas in the laboratory and test its properties.',
+                materials='Hydrogen peroxide, manganese dioxide, conical flask, delivery tube, gas jar, water trough, glowing splint.',
+                procedure='Add manganese dioxide to hydrogen peroxide in a flask. Collect the gas over water in a gas jar. Insert a glowing splint into the gas jar.',
+                safety_precautions='Wear eye protection. Do not point apparatus at people. Handle glassware carefully. Keep chemicals away from the mouth.',
+                expected_result='A glowing splint relights in oxygen gas.'
+            ),
+            LabExperiment(
+                title='Measuring Density of an Irregular Solid',
+                subject='Physics',
+                class_level='S.1',
+                objective='To determine density using mass and displaced water volume.',
+                materials='Irregular stone, measuring cylinder, water, beam balance, thread.',
+                procedure='Measure the mass of the stone. Record the initial water volume in a measuring cylinder. Lower the stone into water and record the new volume. Calculate density as mass divided by volume displaced.',
+                safety_precautions='Do not drop objects into glass cylinders. Wipe water spills to prevent slipping.',
+                expected_result='Density is calculated in g/cm3 from measured mass and displaced volume.'
+            ),
+        ])
+        db.session.commit()
+    if LabSchedule.query.count() == 0:
+        first_experiment = LabExperiment.query.first()
+        if first_experiment:
+            db.session.add(LabSchedule(
+                experiment_id=first_experiment.id,
+                class_level=first_experiment.class_level,
+                scheduled_date=date.today(),
+                start_time='10:00',
+                end_time='11:20',
+                laboratory='Biology Lab',
+                technician='Mr. Lab Technician'
+            ))
+            db.session.commit()
 
 # OpenAI intelligence support
 
@@ -521,8 +635,18 @@ def call_openai_model(messages, max_tokens=350, temperature=0.2):
     """Call OpenAI chat completion and return text result."""
     if not AI_ENABLED:
         raise RuntimeError("OpenAI is not configured.")
+    model = os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
+    if openai_client:
+        response = openai_client.chat.completions.create(
+            model=model,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+        return response.choices[0].message.content.strip()
+
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=model,
         messages=messages,
         max_tokens=max_tokens,
         temperature=temperature,
@@ -706,6 +830,282 @@ def handle_pending_action(user_query):
     return None
 
 
+def build_lab_response(user_query):
+    query_lower = user_query.lower()
+    lab_keywords = [
+        'laboratory', 'lab ', ' lab', 'experiment', 'practical', 'chemical',
+        'apparatus', 'equipment', 'safety', 'biuret', 'protein', 'oxygen gas',
+        'microscope', 'test tube'
+    ]
+    if not any(keyword in query_lower for keyword in lab_keywords):
+        return None
+
+    level = parse_class_level(user_query)
+    subject_match = None
+    for subject in ['biology', 'chemistry', 'physics', 'science']:
+        if subject in query_lower:
+            subject_match = subject
+            break
+
+    if any(word in query_lower for word in ['inventory', 'chemical', 'apparatus', 'equipment', 'stock', 'available']):
+        items_query = LabItem.query
+        for item_type in ['chemical', 'apparatus', 'equipment']:
+            if item_type in query_lower:
+                items_query = items_query.filter_by(item_type=item_type)
+                break
+        items = items_query.order_by(LabItem.item_type, LabItem.name).limit(8).all()
+        if items:
+            response = "**Laboratory inventory:**\n\n"
+            for item in items:
+                stock_note = " - low stock" if item.is_low_stock else ""
+                response += f"- {item.name}: {item.quantity:g} {item.unit or ''} ({item.item_type}, {item.location or 'Lab store'}){stock_note}\n"
+            return {"response": response, "type": "lab_inventory", "category": "Smart Laboratory"}
+
+    if any(word in query_lower for word in ['schedule', 'when', 'lesson', 'booking', 'booked']):
+        schedules_query = LabSchedule.query
+        if level:
+            schedules_query = schedules_query.filter_by(class_level=level)
+        schedules = schedules_query.order_by(LabSchedule.scheduled_date, LabSchedule.start_time).limit(5).all()
+        if schedules:
+            response = "**Upcoming practical lessons:**\n\n"
+            for schedule in schedules:
+                response += (
+                    f"- {schedule.class_level}: {schedule.experiment.title} on "
+                    f"{schedule.scheduled_date.strftime('%Y-%m-%d')} from {schedule.start_time} to {schedule.end_time} "
+                    f"in {schedule.laboratory}\n"
+                )
+            return {"response": response, "type": "lab_schedule", "category": "Smart Laboratory"}
+
+    experiments_query = LabExperiment.query
+    if level:
+        experiments_query = experiments_query.filter_by(class_level=level)
+    if subject_match and subject_match != 'science':
+        experiments_query = experiments_query.filter(LabExperiment.subject.ilike(f"%{subject_match}%"))
+
+    if 'biuret' in query_lower or 'protein' in query_lower:
+        experiments_query = LabExperiment.query.filter(LabExperiment.title.ilike('%protein%'))
+    elif 'oxygen' in query_lower:
+        experiments_query = LabExperiment.query.filter(LabExperiment.title.ilike('%oxygen%'))
+    elif 'density' in query_lower:
+        experiments_query = LabExperiment.query.filter(LabExperiment.title.ilike('%density%'))
+
+    experiments = experiments_query.order_by(LabExperiment.subject, LabExperiment.class_level).limit(3).all()
+    if experiments:
+        response = "**Smart laboratory guidance:**\n\n"
+        for experiment in experiments:
+            response += (
+                f"**{experiment.title}** ({experiment.subject}, {experiment.class_level})\n"
+                f"Objective: {experiment.objective}\n"
+                f"Materials: {experiment.materials}\n"
+                f"Procedure: {experiment.procedure}\n"
+                f"Safety: {experiment.safety_precautions}\n"
+            )
+            if experiment.expected_result:
+                response += f"Expected result: {experiment.expected_result}\n"
+            response += "\n"
+        return {"response": response.strip(), "type": "lab_experiment", "category": "Smart Laboratory"}
+
+    return {
+        "response": "The smart laboratory module can help with experiment procedures, chemical safety, apparatus inventory, practical schedules, and lab reports. Try asking: How do I test for proteins?",
+        "type": "lab_help",
+        "category": "Smart Laboratory"
+    }
+
+
+SUBJECT_ALIASES = {
+    'math': 'Mathematics',
+    'maths': 'Mathematics',
+    'mathematics': 'Mathematics',
+    'physics': 'Physics',
+    'chemistry': 'Chemistry',
+    'biology': 'Biology',
+    'english': 'English',
+    'ict': 'ICT',
+    'computer': 'ICT',
+    'computer studies': 'ICT',
+}
+
+
+def detect_subject(text):
+    text_lower = text.lower()
+    for token, subject in SUBJECT_ALIASES.items():
+        if token in text_lower:
+            return subject
+    return None
+
+
+def is_learning_request(text):
+    text_lower = text.lower()
+    learning_keywords = [
+        'explain', 'solve', 'summarize', 'summary', 'teach me', 'what is',
+        'define', 'homework', 'hint', 'answer this', 'revision', 'study material',
+        'quiz me', 'give me a quiz', 'generate quiz', 'osmosis', 'photosynthesis'
+    ]
+    return any(keyword in text_lower for keyword in learning_keywords) or bool(detect_subject(text))
+
+
+def fallback_tutor_answer(question, subject=None):
+    question_lower = question.lower()
+    if 'osmosis' in question_lower:
+        return (
+            "Osmosis is the movement of water molecules from a region of high water concentration "
+            "to a region of low water concentration through a semi-permeable membrane. For example, "
+            "plant root hairs absorb water from the soil by osmosis."
+        )
+    if 'photosynthesis' in question_lower:
+        return (
+            "Photosynthesis is the process by which green plants make food using sunlight, carbon dioxide, "
+            "and water. Chlorophyll traps light energy, and the products are glucose and oxygen. "
+            "Word equation: carbon dioxide + water -> glucose + oxygen."
+        )
+    if 'protein' in question_lower or 'biuret' in question_lower:
+        lab_response = build_lab_response(question)
+        if lab_response:
+            return lab_response['response']
+    if 'summarize' in question_lower or 'summary' in question_lower:
+        return summarize_notes_text(question)
+    if 'quiz' in question_lower:
+        return generate_quiz_text(subject or 'General Science', 5)
+
+    subject_text = subject or 'the subject'
+    return (
+        f"I can help with {subject_text}. Send the exact question, topic, or notes, and I will explain it step by step, "
+        "give hints first, and then show a clear answer. Example: Explain osmosis for S.3 Biology."
+    )
+
+
+def ai_tutor_answer(question, subject=None, level=None):
+    subject = subject or detect_subject(question) or 'General Studies'
+    level = level or parse_class_level(question) or 'O-Level'
+    if AI_ENABLED:
+        try:
+            return call_openai_model([
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an AI tutor for St. Jonathan High School in Uganda. "
+                        "Teach clearly for secondary school learners. Give step-by-step explanations, "
+                        "use simple examples, and avoid doing harmful lab instructions without safety notes. "
+                        "When solving homework, give hints and reasoning before the final answer."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": f"Subject: {subject}\nLevel: {level}\nStudent question: {question}"
+                }
+            ], max_tokens=650, temperature=0.25)
+        except Exception as e:
+            print(f"AI tutor error: {e}")
+    return fallback_tutor_answer(question, subject=subject)
+
+
+def summarize_notes_text(notes):
+    notes = notes.strip()
+    if not notes:
+        return "Paste your notes and I will summarize the key points."
+    if AI_ENABLED:
+        try:
+            return call_openai_model([
+                {"role": "system", "content": "Summarize student notes into concise revision points, key terms, and likely exam questions."},
+                {"role": "user", "content": notes}
+            ], max_tokens=550, temperature=0.2)
+        except Exception as e:
+            print(f"Notes summary error: {e}")
+
+    sentences = re.split(r'(?<=[.!?])\s+', notes)
+    summary = sentences[:4] if len(sentences) > 1 else [notes[:450]]
+    return "Revision summary:\n- " + "\n- ".join(line.strip() for line in summary if line.strip())
+
+
+def generate_quiz_text(subject, count=5, level='O-Level'):
+    try:
+        count = max(1, min(int(count), 10))
+    except (TypeError, ValueError):
+        count = 5
+    subject = subject or 'General Science'
+    if AI_ENABLED:
+        try:
+            return call_openai_model([
+                {
+                    "role": "system",
+                    "content": (
+                        "Generate a school revision quiz. Include numbered questions, four options for MCQ questions, "
+                        "the correct answer, and a short marking guide."
+                    )
+                },
+                {"role": "user", "content": f"Create {count} {level} questions for {subject}."}
+            ], max_tokens=850, temperature=0.35)
+        except Exception as e:
+            print(f"Quiz generation error: {e}")
+
+    samples = {
+        'Biology': [
+            ('What is osmosis?', 'Movement of water through a semi-permeable membrane from high to low water concentration.'),
+            ('Which organelle carries out photosynthesis?', 'Chloroplast.'),
+            ('What is the function of red blood cells?', 'Transporting oxygen.'),
+        ],
+        'Chemistry': [
+            ('What gas relights a glowing splint?', 'Oxygen.'),
+            ('What is a mixture?', 'Two or more substances physically combined.'),
+            ('What colour does blue litmus turn in acid?', 'Red.'),
+        ],
+        'Mathematics': [
+            ('Solve 2x + 5 = 13.', 'x = 4.'),
+            ('Find 20% of 150.', '30.'),
+            ('What is the area of a rectangle?', 'Length x width.'),
+        ],
+    }
+    questions = samples.get(subject, samples['Biology'])
+    response = f"{subject} quiz:\n\n"
+    for index in range(count):
+        question, answer = questions[index % len(questions)]
+        response += f"{index + 1}. {question}\nAnswer: {answer}\n\n"
+    return response.strip()
+
+
+def build_performance_analysis(student):
+    if not student:
+        return "No linked student record was found yet, so I cannot analyze performance."
+
+    marks = Exam.query.filter_by(student_id=student.id).all()
+    attendance = Attendance.query.filter_by(student_id=student.id).all()
+    if not marks and not attendance:
+        return f"No marks or attendance records are available yet for {student.name}."
+
+    lines = [f"Performance analysis for {student.name} ({student.class_level}):"]
+    if marks:
+        subject_scores = {}
+        for mark in marks:
+            subject_scores.setdefault(mark.subject, []).append(mark.score)
+        averages = {
+            subject: sum(scores) / len(scores)
+            for subject, scores in subject_scores.items()
+        }
+        best_subject = max(averages, key=averages.get)
+        weak_subject = min(averages, key=averages.get)
+        lines.append(f"- Strongest subject: {best_subject} ({averages[best_subject]:.1f} average).")
+        lines.append(f"- Needs more revision: {weak_subject} ({averages[weak_subject]:.1f} average).")
+        if averages[weak_subject] < 50:
+            lines.append(f"- Recommendation: schedule extra practice and teacher support in {weak_subject}.")
+    if attendance:
+        present = sum(1 for item in attendance if item.status.lower() == 'present')
+        rate = (present / len(attendance)) * 100
+        lines.append(f"- Attendance rate: {rate:.1f}% based on {len(attendance)} records.")
+        if rate < 85:
+            lines.append("- Recommendation: improve attendance consistency because missed lessons affect performance.")
+    return "\n".join(lines)
+
+
+def get_current_student_record():
+    if not current_user.is_authenticated:
+        return None
+    if current_user.role == 'student':
+        return Student.query.filter_by(name=current_user.name).first()
+    if current_user.role == 'parent':
+        return Student.query.filter_by(parent_id=current_user.id).first()
+    return None
+
+
 def generate_response(user_query, history=None):
     """Generate chatbot response based on user query"""
     pending_response = handle_pending_action(user_query)
@@ -737,6 +1137,46 @@ def generate_response(user_query, history=None):
                 'category': 'Admissions',
                 'confidence': 0.95,
             }
+
+    lab_response = build_lab_response(user_query)
+    if lab_response:
+        return lab_response
+
+    query_lower = user_query.lower()
+    if any(keyword in query_lower for keyword in ['performance', 'weak subject', 'attendance trend', 'analyze my marks', 'analyse my marks']):
+        student = get_current_student_record()
+        return {
+            "response": build_performance_analysis(student),
+            "type": "performance_analysis",
+            "category": "Academic Assistant"
+        }
+
+    if any(keyword in query_lower for keyword in ['give me a quiz', 'generate quiz', 'quiz me', 'revision questions']):
+        subject = detect_subject(user_query) or 'General Science'
+        count_match = re.search(r'\b(\d{1,2})\b', user_query)
+        count = int(count_match.group(1)) if count_match else 5
+        level = parse_class_level(user_query) or context.get('level') or 'O-Level'
+        return {
+            "response": generate_quiz_text(subject, count=count, level=level),
+            "type": "quiz_generator",
+            "category": "AI Tutor"
+        }
+
+    if any(keyword in query_lower for keyword in ['summarize', 'summarise', 'summary of', 'summarize this note', 'summarise this note']):
+        return {
+            "response": summarize_notes_text(user_query),
+            "type": "notes_summarizer",
+            "category": "AI Tutor"
+        }
+
+    if is_learning_request(user_query):
+        subject = detect_subject(user_query)
+        level = parse_class_level(user_query) or context.get('level')
+        return {
+            "response": ai_tutor_answer(user_query, subject=subject, level=level),
+            "type": "ai_tutor",
+            "category": subject or "AI Tutor"
+        }
 
     # AI-powered response first, if available
     ai_response = ai_generate_response(user_query, history=history)
@@ -1115,6 +1555,83 @@ def get_faqs():
     return jsonify(FAQS)
 
 
+@app.route('/learning')
+@login_required
+def learning_assistant():
+    student = get_current_student_record()
+    performance_summary = build_performance_analysis(student)
+    return render_template(
+        'learning_assistant.html',
+        student=student,
+        performance_summary=performance_summary,
+        subjects=['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'ICT']
+    )
+
+
+@app.route('/api/tutor', methods=['POST'])
+@login_required
+def api_tutor():
+    data = request.get_json(silent=True) or {}
+    question = data.get('question', '').strip()
+    subject = data.get('subject') or detect_subject(question)
+    level = data.get('level') or parse_class_level(question)
+    if not question:
+        return jsonify({'error': 'Question is required'}), 400
+    answer = ai_tutor_answer(question, subject=subject, level=level)
+    return jsonify({'answer': answer, 'subject': subject or 'AI Tutor'})
+
+
+@app.route('/api/quiz/generate', methods=['POST'])
+@login_required
+def api_generate_quiz():
+    data = request.get_json(silent=True) or {}
+    subject = data.get('subject') or 'General Science'
+    count = data.get('count', 5)
+    level = data.get('level') or 'O-Level'
+    return jsonify({'quiz': generate_quiz_text(subject, count=count, level=level)})
+
+
+@app.route('/api/notes/summarize', methods=['POST'])
+@login_required
+def api_summarize_notes():
+    notes = ''
+    if request.content_type and request.content_type.startswith('multipart/form-data'):
+        notes = request.form.get('notes', '').strip()
+        uploaded_file = request.files.get('file')
+        if uploaded_file and not notes:
+            filename = uploaded_file.filename or 'uploaded file'
+            notes = f"The student uploaded {filename}. Text extraction is not configured yet, so ask them to paste the note text for summarizing."
+    else:
+        data = request.get_json(silent=True) or {}
+        notes = data.get('notes', '').strip()
+
+    if not notes:
+        return jsonify({'error': 'Notes text is required'}), 400
+    return jsonify({'summary': summarize_notes_text(notes)})
+
+
+@app.route('/api/homework/help', methods=['POST'])
+@login_required
+def api_homework_help():
+    data = request.get_json(silent=True) or {}
+    question = data.get('question', '').strip()
+    subject = data.get('subject') or detect_subject(question)
+    if not question:
+        return jsonify({'error': 'Homework question is required'}), 400
+    prompt = (
+        "Help with this homework. Give hints first, explain the method, and then provide a clear final answer. "
+        f"Question: {question}"
+    )
+    return jsonify({'answer': ai_tutor_answer(prompt, subject=subject), 'subject': subject or 'Homework'})
+
+
+@app.route('/api/performance')
+@login_required
+def api_performance():
+    student = get_current_student_record()
+    return jsonify({'analysis': build_performance_analysis(student)})
+
+
 @app.route('/api/fees', methods=['GET'])
 def get_fees():
     """Get structured fee information."""
@@ -1466,6 +1983,156 @@ def teacher_add_comment():
         db.session.add(student_comment)
         db.session.commit()
     return redirect(url_for('teacher_portal'))
+
+
+def can_manage_laboratory():
+    return session.get('admin_authenticated') or (
+        current_user.is_authenticated and current_user.role in ['admin', 'staff']
+    )
+
+
+@app.route('/laboratory', methods=['GET', 'POST'])
+def laboratory():
+    message = None
+    error = None
+    if request.method == 'POST':
+        form_type = request.form.get('form_type')
+        if form_type in ['item', 'experiment', 'schedule'] and not can_manage_laboratory():
+            return redirect(url_for('auth_login'))
+        if form_type == 'report' and not current_user.is_authenticated:
+            return redirect(url_for('auth_login'))
+
+        if form_type == 'item':
+            name = request.form.get('name', '').strip()
+            item_type = request.form.get('item_type', '').strip()
+            if not name or not item_type:
+                error = 'Please provide item name and type.'
+            else:
+                item = LabItem(
+                    name=name,
+                    item_type=item_type,
+                    quantity=float(request.form.get('quantity') or 0),
+                    unit=request.form.get('unit', '').strip(),
+                    location=request.form.get('location', '').strip(),
+                    safety_notes=request.form.get('safety_notes', '').strip(),
+                    reorder_level=float(request.form.get('reorder_level') or 0),
+                )
+                db.session.add(item)
+                db.session.commit()
+                message = 'Laboratory inventory item saved.'
+        elif form_type == 'experiment':
+            title = request.form.get('title', '').strip()
+            if not title:
+                error = 'Please provide the experiment title.'
+            else:
+                experiment = LabExperiment(
+                    title=title,
+                    subject=request.form.get('subject', '').strip() or 'Science',
+                    class_level=request.form.get('class_level', '').strip() or 'All',
+                    objective=request.form.get('objective', '').strip(),
+                    materials=request.form.get('materials', '').strip(),
+                    procedure=request.form.get('procedure', '').strip(),
+                    safety_precautions=request.form.get('safety_precautions', '').strip(),
+                    expected_result=request.form.get('expected_result', '').strip(),
+                )
+                db.session.add(experiment)
+                db.session.commit()
+                message = 'Experiment procedure saved.'
+        elif form_type == 'schedule':
+            experiment_id = request.form.get('experiment_id')
+            scheduled_date = request.form.get('scheduled_date')
+            if not experiment_id or not scheduled_date:
+                error = 'Please choose an experiment and date.'
+            else:
+                schedule = LabSchedule(
+                    experiment_id=int(experiment_id),
+                    class_level=request.form.get('class_level', '').strip(),
+                    scheduled_date=datetime.strptime(scheduled_date, '%Y-%m-%d').date(),
+                    start_time=request.form.get('start_time', '').strip(),
+                    end_time=request.form.get('end_time', '').strip(),
+                    laboratory=request.form.get('laboratory', '').strip() or 'Science Lab',
+                    technician=request.form.get('technician', '').strip(),
+                )
+                db.session.add(schedule)
+                db.session.commit()
+                message = 'Practical lesson scheduled.'
+        elif form_type == 'report':
+            experiment_id = request.form.get('experiment_id')
+            student_name = request.form.get('student_name', '').strip()
+            if not experiment_id or not student_name:
+                error = 'Please choose an experiment and provide student name.'
+            else:
+                report = LabReport(
+                    experiment_id=int(experiment_id),
+                    student_name=student_name,
+                    class_level=request.form.get('class_level', '').strip(),
+                    observations=request.form.get('observations', '').strip(),
+                    conclusion=request.form.get('conclusion', '').strip(),
+                )
+                db.session.add(report)
+                db.session.commit()
+                message = 'Laboratory report submitted.'
+
+    items = LabItem.query.order_by(LabItem.item_type, LabItem.name).all()
+    experiments = LabExperiment.query.order_by(LabExperiment.subject, LabExperiment.class_level, LabExperiment.title).all()
+    schedules = LabSchedule.query.options(db.joinedload(LabSchedule.experiment)).order_by(LabSchedule.scheduled_date, LabSchedule.start_time).all()
+    reports = LabReport.query.options(db.joinedload(LabReport.experiment)).order_by(LabReport.submitted_at.desc()).limit(12).all()
+    return render_template(
+        'laboratory.html',
+        items=items,
+        experiments=experiments,
+        schedules=schedules,
+        reports=reports,
+        can_manage=can_manage_laboratory(),
+        message=message,
+        error=error,
+    )
+
+
+@app.route('/api/laboratory')
+def api_laboratory():
+    items = LabItem.query.order_by(LabItem.item_type, LabItem.name).all()
+    experiments = LabExperiment.query.order_by(LabExperiment.subject, LabExperiment.class_level).all()
+    schedules = LabSchedule.query.options(db.joinedload(LabSchedule.experiment)).order_by(LabSchedule.scheduled_date).all()
+    return jsonify({
+        'inventory': [
+            {
+                'name': item.name,
+                'type': item.item_type,
+                'quantity': item.quantity,
+                'unit': item.unit,
+                'location': item.location,
+                'safety_notes': item.safety_notes,
+                'low_stock': item.is_low_stock,
+            }
+            for item in items
+        ],
+        'experiments': [
+            {
+                'title': experiment.title,
+                'subject': experiment.subject,
+                'class_level': experiment.class_level,
+                'objective': experiment.objective,
+                'materials': experiment.materials,
+                'procedure': experiment.procedure,
+                'safety_precautions': experiment.safety_precautions,
+                'expected_result': experiment.expected_result,
+            }
+            for experiment in experiments
+        ],
+        'schedules': [
+            {
+                'experiment': schedule.experiment.title if schedule.experiment else 'Experiment',
+                'class_level': schedule.class_level,
+                'date': schedule.scheduled_date.isoformat(),
+                'start_time': schedule.start_time,
+                'end_time': schedule.end_time,
+                'laboratory': schedule.laboratory,
+                'technician': schedule.technician,
+            }
+            for schedule in schedules
+        ],
+    })
 
 
 @app.route('/payments', methods=['GET', 'POST'])

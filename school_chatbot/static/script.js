@@ -226,7 +226,13 @@ window.addEventListener('click', (event) => {
 
 // Focus input on page load
 window.addEventListener('load', () => {
-    document.getElementById('userInput').focus();
+    const userInput = document.getElementById('userInput');
+    userInput.focus();
+    const params = new URLSearchParams(window.location.search);
+    const ask = params.get('ask');
+    if (ask) {
+        sendMessage(ask);
+    }
 });
 
 // Toggle info panel on mobile

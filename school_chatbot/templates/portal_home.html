@@ -37,10 +37,20 @@
                 <strong>Student Portal</strong>
                 <p>View marks, timetable, reminders, library books, and counselor contacts.</p>
             </a>
+            <a class="portal-card" href="{{ url_for('learning_assistant') }}">
+                <span>AI Tutor</span>
+                <strong>Learning Assistant</strong>
+                <p>Ask subject questions, generate quizzes, summarize notes, and review performance.</p>
+            </a>
             <a class="portal-card" href="{{ url_for('auth_login') }}">
                 <span>Teacher</span>
                 <strong>Teacher Portal</strong>
                 <p>Record marks, manage attendance, view learners, and follow class reminders.</p>
+            </a>
+            <a class="portal-card" href="{{ url_for('laboratory') }}">
+                <span>Laboratory</span>
+                <strong>Smart Lab</strong>
+                <p>View experiments, chemical safety notes, inventory, schedules, and lab reports.</p>
             </a>
         </main>
     </div>

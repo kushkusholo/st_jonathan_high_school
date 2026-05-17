@@ -23,6 +23,8 @@
                     <p><strong>Principal:</strong> {{ school_info.principal }}</p>
                     <p><strong>Established:</strong> {{ school_info.established }}</p>
                     <p><a class="utility-btn" href="{{ url_for('portal_home') }}">All Portals</a></p>
+                    <p><a class="utility-btn" href="{{ url_for('learning_assistant') }}">AI Learning</a></p>
+                    <p><a class="utility-btn" href="{{ url_for('laboratory') }}">Smart Laboratory</a></p>
                     <p><a class="utility-btn" href="/admin/login">Admin Dashboard</a></p>
                     <p><a class="utility-btn" href="/auth/login">Portal Login</a></p>
                     <p><a class="utility-btn" href="/auth/register">Register</a></p>
@@ -56,6 +58,10 @@
                         <button class="suggestion-btn" onclick="sendMessage('What subjects are offered?')">Subjects</button>
                         <button class="suggestion-btn" onclick="sendMessage('Does the school provide boarding?')">Boarding</button>
                         <button class="suggestion-btn" onclick="sendMessage('What extracurricular activities are available?')">Activities</button>
+                        <button class="suggestion-btn" onclick="sendMessage('How do I test for proteins?')">Protein Test</button>
+                        <button class="suggestion-btn" onclick="sendMessage('Show laboratory inventory')">Lab Inventory</button>
+                        <button class="suggestion-btn" onclick="sendMessage('Explain osmosis for S.3 Biology')">AI Tutor</button>
+                        <button class="suggestion-btn" onclick="sendMessage('Give me 5 biology quiz questions')">Generate Quiz</button>
                     </div>
                 </div>
 
@@ -69,6 +75,8 @@
                     <h3>🚀 Quick Services</h3>
                     <button class="suggestion-btn" onclick="sendMessage('What is the school fee structure?')">Check Fees</button>
                     <button class="suggestion-btn" onclick="window.location.href='/admissions'">Apply Now</button>
+                    <button class="suggestion-btn" onclick="window.location.href='/learning'">AI Learning</button>
+                    <button class="suggestion-btn" onclick="window.location.href='/laboratory'">Smart Laboratory</button>
                     <button class="suggestion-btn" onclick="sendMessage('How can I contact the school?')">Contact School</button>
                 </div>
             </aside>
@@ -85,7 +93,7 @@
                     <div class="message bot-message welcome-message">
                         <div class="message-content">
                             <p><strong>Welcome to St. Jonathan High School!</strong></p>
-                            <p>I'm your school assistant, ready to help parents and guardians with information about admissions, fees, academic programs, facilities, and more.</p>
+                            <p>I'm your school assistant, ready to help with admissions, fees, academics, laboratory practicals, safety, and school information.</p>
                             <p>Feel free to ask any questions about our school. What would you like to know?</p>
                         </div>
                         <span class="timestamp">Just now</span>

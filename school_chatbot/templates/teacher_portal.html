@@ -17,6 +17,7 @@
                 <div class="admin-actions">
                     <a class="utility-btn" href="{{ url_for('staff_attendance') }}">Attendance</a>
                     <a class="utility-btn" href="{{ url_for('staff_exams') }}">Marks</a>
+                    <a class="utility-btn" href="{{ url_for('laboratory') }}">Smart Laboratory</a>
                     <a class="utility-btn" href="{{ url_for('auth_logout') }}">Logout</a>
                 </div>
             </div>
@@ -30,6 +31,7 @@
                 </div>
                 <div class="dashboard-actions compact-actions">
                     <a class="suggestion-btn" href="/">Ask Chatbot</a>
+                    <a class="suggestion-btn" href="{{ url_for('laboratory') }}">Lab Manager</a>
                     <a class="suggestion-btn" href="{{ url_for('notifications') }}">Notifications</a>
                     <a class="suggestion-btn" href="{{ url_for('portal_home') }}">All Portals</a>
                 </div>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Learning Assistant - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>AI Learning Assistant</h1>
+                    <p>{% if student %}{{ student.name }} - {{ student.class_level }}{% else %}Personal tutor, quiz generator, notes summarizer, and homework helper.{% endif %}</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="{{ url_for('student_portal') if current_user.role == 'student' else url_for('dashboard') }}">Dashboard</a>
+                    <a class="utility-btn" href="{{ url_for('laboratory') }}">Smart Laboratory</a>
+                    <a class="utility-btn" href="/">Chatbot</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main portal-main">
+            <section class="dashboard-card dashboard-wide student-hero-card">
+                <div>
+                    <h2>Study Companion</h2>
+                    <p>Ask questions, generate revision quizzes, summarize notes, and check learning progress.</p>
+                </div>
+                <div class="dashboard-actions compact-actions">
+                    <button class="suggestion-btn" type="button" onclick="fillTutor('Explain osmosis for S.3 Biology')">Osmosis</button>
+                    <button class="suggestion-btn" type="button" onclick="fillTutor('Solve 2x + 5 = 13')">Math Help</button>
+                    <button class="suggestion-btn" type="button" onclick="fillTutor('Explain photosynthesis')">Photosynthesis</button>
+                </div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>AI Tutor</h2>
+                <form class="portal-form" onsubmit="submitTutor(event)">
+                    <label>Subject
+                        <select id="tutorSubject">
+                            <option value="">Auto-detect</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject }}">{{ subject }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Question
+                        <textarea id="tutorQuestion" rows="5" required placeholder="Ask: Explain photosynthesis, solve a math question, or help me revise ICT."></textarea>
+                    </label>
+                    <button type="submit" class="send-btn">Ask Tutor</button>
+                </form>
+                <div id="tutorAnswer" class="assistant-output"></div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Quiz Generator</h2>
+                <form class="portal-form" onsubmit="submitQuiz(event)">
+                    <label>Subject
+                        <select id="quizSubject">
+                            {% for subject in subjects %}
+                                <option value="{{ subject }}">{{ subject }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Number of Questions
+                        <input id="quizCount" type="number" min="1" max="10" value="5">
+                    </label>
+                    <label>Level
+                        <input id="quizLevel" type="text" value="{{ student.class_level if student else 'O-Level' }}">
+                    </label>
+                    <button type="submit" class="send-btn">Generate Quiz</button>
+                </form>
+                <div id="quizOutput" class="assistant-output"></div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Notes Summarizer</h2>
+                <form class="portal-form" onsubmit="submitSummary(event)">
+                    <label>Paste Notes
+                        <textarea id="notesText" rows="8" required placeholder="Paste class notes here for revision points and likely exam questions."></textarea>
+                    </label>
+                    <button type="submit" class="send-btn">Summarize Notes</button>
+                </form>
+                <div id="summaryOutput" class="assistant-output"></div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Homework Assistant</h2>
+                <form class="portal-form" onsubmit="submitHomework(event)">
+                    <label>Question
+                        <textarea id="homeworkQuestion" rows="6" required placeholder="Paste a homework question. The assistant gives hints and explains the answer."></textarea>
+                    </label>
+                    <button type="submit" class="send-btn">Get Help</button>
+                </form>
+                <div id="homeworkOutput" class="assistant-output"></div>
+            </section>
+
+            <section class="dashboard-card dashboard-wide">
+                <h2>Performance Analysis</h2>
+                <pre class="assistant-output">{{ performance_summary }}</pre>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function showOutput(id, text) {
+            const element = document.getElementById(id);
+            element.textContent = text || 'No response returned.';
+        }
+
+        function fillTutor(text) {
+            document.getElementById('tutorQuestion').value = text;
+        }
+
+        async function postJson(url, payload) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Request failed');
+            }
+            return data;
+        }
+
+        async function submitTutor(event) {
+            event.preventDefault();
+            showOutput('tutorAnswer', 'Thinking...');
+            try {
+                const data = await postJson('/api/tutor', {
+                    subject: document.getElementById('tutorSubject').value,
+                    question: document.getElementById('tutorQuestion').value
+                });
+                showOutput('tutorAnswer', data.answer);
+            } catch (error) {
+                showOutput('tutorAnswer', error.message);
+            }
+        }
+
+        async function submitQuiz(event) {
+            event.preventDefault();
+            showOutput('quizOutput', 'Generating quiz...');
+            try {
+                const data = await postJson('/api/quiz/generate', {
+                    subject: document.getElementById('quizSubject').value,
+                    count: document.getElementById('quizCount').value,
+                    level: document.getElementById('quizLevel').value
+                });
+                showOutput('quizOutput', data.quiz);
+            } catch (error) {
+                showOutput('quizOutput', error.message);
+            }
+        }
+
+        async function submitSummary(event) {
+            event.preventDefault();
+            showOutput('summaryOutput', 'Summarizing...');
+            try {
+                const data = await postJson('/api/notes/summarize', {
+                    notes: document.getElementById('notesText').value
+                });
+                showOutput('summaryOutput', data.summary);
+            } catch (error) {
+                showOutput('summaryOutput', error.message);
+            }
+        }
+
+        async function submitHomework(event) {
+            event.preventDefault();
+            showOutput('homeworkOutput', 'Working through it...');
+            try {
+                const data = await postJson('/api/homework/help', {
+                    question: document.getElementById('homeworkQuestion').value
+                });
+                showOutput('homeworkOutput', data.answer);
+            } catch (error) {
+                showOutput('homeworkOutput', error.message);
+            }
+        }
+    </script>
+</body>
+</html>

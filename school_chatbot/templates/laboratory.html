@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Laboratory - St. Jonathan High School</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Smart Laboratory</h1>
+                    <p>Experiments, safety guidance, inventory, schedules, and practical reports.</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="utility-btn" href="/">Ask AI Assistant</a>
+                    <a class="utility-btn" href="{{ url_for('portal_home') }}">All Portals</a>
+                    {% if current_user.is_authenticated %}
+                        <a class="utility-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    {% else %}
+                        <a class="utility-btn" href="{{ url_for('auth_login') }}">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main portal-main">
+            {% if message %}<div class="success-message dashboard-wide">{{ message }}</div>{% endif %}
+            {% if error %}<div class="error-message dashboard-wide">{{ error }}</div>{% endif %}
+
+            <section class="dashboard-card dashboard-wide student-hero-card">
+                <div>
+                    <h2>Laboratory Assistant</h2>
+                    <p>Ask the chatbot questions like "How do I test for proteins?" or "Show lab inventory".</p>
+                </div>
+                <div class="dashboard-actions compact-actions">
+                    <a class="suggestion-btn" href="/?ask=How%20do%20I%20test%20for%20proteins">Protein Test</a>
+                    <a class="suggestion-btn" href="/?ask=Show%20laboratory%20inventory">Inventory Help</a>
+                </div>
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Experiment Procedures</h2>
+                {% for experiment in experiments %}
+                    <div class="record-card">
+                        <strong>{{ experiment.title }}</strong>
+                        <p>{{ experiment.subject }} | {{ experiment.class_level }}</p>
+                        <small><strong>Objective:</strong> {{ experiment.objective }}</small>
+                        <small><strong>Safety:</strong> {{ experiment.safety_precautions }}</small>
+                    </div>
+                {% else %}
+                    <p>No experiment procedures saved yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Inventory</h2>
+                {% for item in items %}
+                    <div class="mini-row {% if item.is_low_stock %}low-stock{% endif %}">
+                        <span>{{ item.item_type | capitalize }}{% if item.location %} | {{ item.location }}{% endif %}</span>
+                        <strong>{{ item.name }}: {{ '%g'|format(item.quantity) }} {{ item.unit or '' }}</strong>
+                        <small>{% if item.is_low_stock %}Low stock. {% endif %}{{ item.safety_notes or 'No safety note added.' }}</small>
+                    </div>
+                {% else %}
+                    <p>No laboratory inventory saved yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Practical Schedule</h2>
+                {% for schedule in schedules %}
+                    <div class="mini-row">
+                        <span>{{ schedule.class_level }} | {{ schedule.scheduled_date.strftime('%Y-%m-%d') }}</span>
+                        <strong>{{ schedule.experiment.title if schedule.experiment else 'Experiment' }}</strong>
+                        <small>{{ schedule.start_time }} - {{ schedule.end_time }} | {{ schedule.laboratory }}{% if schedule.technician %} | {{ schedule.technician }}{% endif %}</small>
+                    </div>
+                {% else %}
+                    <p>No practical lessons scheduled yet.</p>
+                {% endfor %}
+            </section>
+
+            <section class="dashboard-card">
+                <h2>Submit Lab Report</h2>
+                <form method="POST" action="{{ url_for('laboratory') }}" class="portal-form">
+                    <input type="hidden" name="form_type" value="report">
+                    <label>Experiment
+                        <select name="experiment_id" required>
+                            <option value="">Select experiment</option>
+                            {% for experiment in experiments %}
+                                <option value="{{ experiment.id }}">{{ experiment.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>Student Name
+                        <input type="text" name="student_name" value="{{ current_user.name if current_user.is_authenticated else '' }}" required>
+                    </label>
+                    <label>Class
+                        <input type="text" name="class_level" placeholder="S.3">
+                    </label>
+                    <label>Observations
+                        <textarea name="observations" rows="4" required></textarea>
+                    </label>
+                    <label>Conclusion
+                        <textarea name="conclusion" rows="3" required></textarea>
+                    </label>
+                    <button type="submit" class="send-btn">Submit Report</button>
+                </form>
+            </section>
+
+            {% if can_manage %}
+                <section class="dashboard-card">
+                    <h2>Add Inventory Item</h2>
+                    <form method="POST" action="{{ url_for('laboratory') }}" class="portal-form">
+                        <input type="hidden" name="form_type" value="item">
+                        <label>Name <input type="text" name="name" required></label>
+                        <label>Type
+                            <select name="item_type" required>
+                                <option value="chemical">Chemical</option>
+                                <option value="apparatus">Apparatus</option>
+                                <option value="equipment">Equipment</option>
+                            </select>
+                        </label>
+                        <label>Quantity <input type="number" name="quantity" step="0.01" required></label>
+                        <label>Unit <input type="text" name="unit" placeholder="litres, pieces, grams"></label>
+                        <label>Reorder Level <input type="number" name="reorder_level" step="0.01" value="0"></label>
+                        <label>Location <input type="text" name="location"></label>
+                        <label>Safety Notes <textarea name="safety_notes" rows="3"></textarea></label>
+                        <button type="submit" class="send-btn">Save Item</button>
+                    </form>
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Add Experiment</h2>
+                    <form method="POST" action="{{ url_for('laboratory') }}" class="portal-form">
+                        <input type="hidden" name="form_type" value="experiment">
+                        <label>Title <input type="text" name="title" required></label>
+                        <label>Subject <input type="text" name="subject" required></label>
+                        <label>Class <input type="text" name="class_level" required></label>
+                        <label>Objective <textarea name="objective" rows="2" required></textarea></label>
+                        <label>Materials <textarea name="materials" rows="3" required></textarea></label>
+                        <label>Procedure <textarea name="procedure" rows="4" required></textarea></label>
+                        <label>Safety Precautions <textarea name="safety_precautions" rows="3" required></textarea></label>
+                        <label>Expected Result <textarea name="expected_result" rows="2"></textarea></label>
+                        <button type="submit" class="send-btn">Save Experiment</button>
+                    </form>
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Schedule Practical</h2>
+                    <form method="POST" action="{{ url_for('laboratory') }}" class="portal-form">
+                        <input type="hidden" name="form_type" value="schedule">
+                        <label>Experiment
+                            <select name="experiment_id" required>
+                                <option value="">Select experiment</option>
+                                {% for experiment in experiments %}
+                                    <option value="{{ experiment.id }}">{{ experiment.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>Class <input type="text" name="class_level" required></label>
+                        <label>Date <input type="date" name="scheduled_date" required></label>
+                        <label>Start Time <input type="time" name="start_time" required></label>
+                        <label>End Time <input type="time" name="end_time" required></label>
+                        <label>Laboratory <input type="text" name="laboratory" value="Science Lab"></label>
+                        <label>Technician <input type="text" name="technician"></label>
+                        <button type="submit" class="send-btn">Save Schedule</button>
+                    </form>
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Recent Lab Reports</h2>
+                    {% for report in reports %}
+                        <div class="mini-row">
+                            <span>{{ report.student_name }} | {{ report.class_level }}</span>
+                            <strong>{{ report.experiment.title if report.experiment else 'Experiment' }}</strong>
+                            <small>{{ report.submitted_at.strftime('%Y-%m-%d') }} | {{ report.conclusion }}</small>
+                        </div>
+                    {% else %}
+                        <p>No reports submitted yet.</p>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
